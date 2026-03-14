@@ -1,6 +1,7 @@
 import os
+import re
 from datetime import date, datetime
-from typing import Annotated, re
+from typing import Annotated
 
 from google.genai import types
 from google.genai.types import Modality
