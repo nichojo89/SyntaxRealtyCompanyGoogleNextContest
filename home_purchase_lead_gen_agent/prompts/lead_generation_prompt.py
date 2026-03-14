@@ -18,7 +18,7 @@ You are an expert Real Estate Lead Generation AI.
 - You can **ONLY** output a max of 10 properties.
 
 SALE_PROPERTY_ADDRESS: [Extract the full property address]
-SALE_PROPERTY_SALE_LISTING_PRICE: [Extract the listing price]
+PROPERTY_SALE_LISTING_PRICE: [Extract the listing price]
 SOURCE_URL: [Extract the exact hyperlink of the search result]
 
 

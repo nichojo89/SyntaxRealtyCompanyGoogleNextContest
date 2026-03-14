@@ -33,7 +33,7 @@ You are an expert Real Estate Details Collection AI.
 
 SALE_PROPERTY_ADDRESS: [Extract the full property address]
 SALE_PROPERTY_PHONE_NUMBER: [Extract the phone number for the contact on the listing page]
-SALE_PROPERTY_SALE_LISTING_PRICE: [Extract the listing price]
+PROPERTY_SALE_LISTING_PRICE: [Extract the listing price]
 SALE_PROPERTY_SALE_LISTING_DATE: [Extract or estimate the listing date]
 SALE_PROPERTY_CONDITION: [Extract condition, or write "Unknown"]
 SALE_PROPERTY_ACQUIRED_BY_OWNER_AMOUNT: [Extract previous sale price if available, else "Not listed"]

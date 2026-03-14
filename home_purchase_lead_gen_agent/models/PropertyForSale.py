@@ -9,9 +9,9 @@ class PropertyDetails(BaseModel):
         alias="SALE_PROPERTY_ADDRESS",
         default="Not listed"
     )
-    sale_property_sale_listing_price: str = Field(
+    PROPERTY_SALE_LISTING_PRICE: str = Field(
         description="Sale price of the property",
-        alias="SALE_PROPERTY_SALE_LISTING_PRICE",
+        alias="PROPERTY_SALE_LISTING_PRICE",
         default="Not listed"
     )
     sale_property_sale_listing_date: Annotated[Optional[date], AfterValidator(parse_mm_dd_yyyy)] = Field(

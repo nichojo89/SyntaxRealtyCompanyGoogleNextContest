@@ -12,7 +12,8 @@ from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.twilio_servi
 from home_purchase_lead_gen_agent.phone_call_agent_as_tool.services.builder import build_pipeline
 
 
-async def call(phone_number: str) -> None:
+async def call(phone_number: str,
+               fsbo_prompt_parameters) -> None:
     room_name = f"VoiceBot-{int(time.time())}"
 
     daily_svc = DailyService()
@@ -26,6 +27,7 @@ async def call(phone_number: str) -> None:
         owner_token=owner_token,
         twilio=twilio_svc,
         recipient_phone=phone_number,
+        fsbo_prompt_parameters=fsbo_prompt_parameters,
     )
 
     print("Starting pipeline runner...")
@@ -33,5 +35,5 @@ async def call(phone_number: str) -> None:
     print(f"Ending pipeline runner... {result}")
 
 
-if __name__ == "__main__":
-    asyncio.run(call(phone_number="+12488906977"))
+# if __name__ == "__main__":
+#     asyncio.run(call(phone_number="+12488906977"))

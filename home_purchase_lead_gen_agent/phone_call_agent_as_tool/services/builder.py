@@ -15,6 +15,7 @@ from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMSe
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
 from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import daily as daily_cfg
 from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
 from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
 from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
 from home_purchase_lead_gen_agent.prompts import negotiate_deal_prompt
@@ -42,16 +43,29 @@ def ensure_playwright_browsers():
 ensure_playwright_browsers()
 
 
-def _get_voice_call_system_instruction() -> str:
+def _get_voice_call_system_instruction(fsbo_prompt_parameters: FSBOPromptParameters) -> str:
     """
     Gets system instruction from the to negotiate deals for homes that have been listed online for a long time.
 
     Returns: system_instruction
     """
+
     bot_name = "Benjamin"
     realtor_name = "Emily West"
     realty_company = "Syntax Realty Company"
-    prompt = (negotiate_deal_prompt.get_negotiation_prompt(bot_name=bot_name, realtor_name=realtor_name, realty_company=realty_company))
+    prompt = negotiate_deal_prompt.get_negotiation_prompt(
+        bot_name=bot_name,
+        realtor_name=realtor_name,
+        realty_company=realty_company,
+        property_address=fsbo_prompt_parameters.sale_property_address,
+        available_appointment_times=fsbo_prompt_parameters.available_appointment_times,
+        property_sale_listing_price=fsbo_prompt_parameters.property_sale_listing_price,
+        property_sale_listing_date=fsbo_prompt_parameters.property_sale_listing_date,
+        sale_property_condition=fsbo_prompt_parameters.sale_property_condition,
+        sale_property_acquired_by_owner_amount=fsbo_prompt_parameters.sale_property_condition,
+        sale_property_acquired_by_owner_year=fsbo_prompt_parameters.sale_property_acquired_by_owner_year,
+        local_rent_estimation=fsbo_prompt_parameters.local_rent_estimation
+    )
 
     return prompt
 
@@ -74,10 +88,10 @@ def build_transport(room: RoomInfo, owner_token: str) -> DailyTransport:
     )
 
 
-def build_llm() -> GeminiLiveLLMService:
+def build_llm(fsbo_prompt_parameters: FSBOPromptParameters) -> GeminiLiveLLMService:
     """Builds the Gemini Live LLM service."""
 
-    prompt = _get_voice_call_system_instruction()
+    prompt = _get_voice_call_system_instruction(fsbo_prompt_parameters=fsbo_prompt_parameters)
 
     return GeminiLiveLLMService(
         api_key=gemini_cfg.gemini_api_key,  # Use api_key instead of credentials
@@ -97,6 +111,7 @@ def build_pipeline(
         owner_token: str,
         twilio: TwilioService,
         recipient_phone: str,
+        fsbo_prompt_parameters: FSBOPromptParameters
 ) -> tuple[PipelineTask, DailyTransport]:
     """
     Assemble the full Pipecat pipeline and register event handlers.
@@ -105,7 +120,7 @@ def build_pipeline(
     """
 
     transport = build_transport(room, owner_token)
-    llm = build_llm()
+    llm = build_llm(fsbo_prompt_parameters=fsbo_prompt_parameters)
 
     pipeline = Pipeline([transport.input(), llm, transport.output()])
     task = PipelineTask(pipeline)
