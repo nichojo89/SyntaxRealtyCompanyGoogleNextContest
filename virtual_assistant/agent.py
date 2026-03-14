@@ -1,6 +1,5 @@
 from google.genai import types
 from google.genai.types import Modality
-from pydantic import BaseModel, Field
 from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.tools import AgentTool
@@ -17,12 +16,14 @@ def exit_loop() -> str:
     """Terminates the loop when pitch score is 90 or above."""
     return "LOOP_TERMINATED_SUCCESSFULLY"
 
+SUBAGENT_MODEL = "gemini-2.5-flash"
+SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 
 
 # Get leads and contact information for leads (Sequential Agent)
 lead_gen_subagent = LlmAgent(
     name="LeadGenerationSubAgent",
-    model="gemini-2.5-flash",
+    model=SUBAGENT_MODEL,
     instruction=lead_generation_prompt.prompt,
     tools=[google_search],
     output_schema=PropertyForSale,
@@ -31,7 +32,7 @@ lead_gen_subagent = LlmAgent(
 
 homeowner_details_subagent = LlmAgent(
     name="HomeownerDetailsSubAgent",
-    model="gemini-2.5-flash",
+    model=SUBAGENT_MODEL,
     instruction=home_owner_details_prompt.prompt,
     tools=[google_search],
     output_key="enriched_leads"
@@ -45,14 +46,14 @@ lead_generation_sequential_agent = SequentialAgent(
 # Create text message to home-owner (Loop Agent)
 content_creator_subagent = LlmAgent(
     name="ContentCreatorSubAgent",
-    model="gemini-2.5-flash",
+    model=SUBAGENT_MODEL,
     instruction=create_text_message_prompt.prompt,
     output_key="pitch_draft"
 )
 
 content_reviewer_subagent = LlmAgent(
     name="ContentReviewerSubAgent",
-    model="gemini-2.5-flash",
+    model=SUBAGENT_MODEL,
     instruction=evaluate_text_message_prompt.prompt,
     tools=[exit_loop],
     output_schema=TextMessageEvaluation
@@ -67,7 +68,7 @@ marketing_content_loop_agent = LoopAgent(
 
 supervisor = LlmAgent(
     name="Evelyn",
-    model="gemini-2.5-flash-native-audio-preview-12-2025",  # Gemini API key version
+    model=SUPERVISOR_MODEL,
     instruction=supervisor_prompt.prompt,
     tools=[
         AgentTool(agent=lead_generation_sequential_agent),
