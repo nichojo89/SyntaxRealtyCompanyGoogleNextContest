@@ -1,13 +1,22 @@
+import threading
+import uvicorn
 from google.genai import types
 from google.adk.agents import LlmAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 
+from home_leads_gen_voice_agent.api.server import app
 from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_prompt
 from home_leads_gen_voice_agent.tools.agent_tools import open_url, initiate_phone_call
 from home_leads_gen_voice_agent.tools.pipeline_tools import run_lead_generation, run_marketing_content
 
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 BOT_NAME = "Evelyn"
+
+def _start_pipeline_server():
+    uvicorn.run(app, host="127.0.0.1", port=8001, log_level="warning")
+
+thread = threading.Thread(target=_start_pipeline_server, daemon=True)
+thread.start()
 
 supervisor = LlmAgent(
     name="Evelyn",
