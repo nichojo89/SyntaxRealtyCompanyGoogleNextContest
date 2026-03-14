@@ -13,10 +13,10 @@ from pipecat.pipeline.task import PipelineTask
 from pipecat.services.gemini_multimodal_live.gemini import GeminiVADParams
 from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMService
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
-from phone_call_agent.config.settings import daily as daily_cfg
-from phone_call_agent.config.settings import gemini as gemini_cfg
-from phone_call_agent.pipeline.daily_service import RoomInfo
-from phone_call_agent.pipeline.twilio_service import TwilioService
+from agents.phone_call_agent.config.settings import daily as daily_cfg
+from agents.phone_call_agent.config.settings import gemini as gemini_cfg
+from agents.phone_call_agent.pipeline.daily_service import RoomInfo
+from agents.phone_call_agent.pipeline.twilio_service import TwilioService
 from prompts import negotiate_deal_prompt
 
 

@@ -7,10 +7,9 @@ Initiates an AI Voice call 📲
 import asyncio
 import time
 from pipecat.pipeline.runner import PipelineRunner
-from phone_call_agent.config.settings import twilio as twilio_cfg
-from phone_call_agent.pipeline.daily_service import DailyService
-from phone_call_agent.pipeline.twilio_service import TwilioService
-from phone_call_agent.services.builder import build_pipeline
+from agents.phone_call_agent.pipeline.daily_service import DailyService
+from agents.phone_call_agent.pipeline.twilio_service import TwilioService
+from agents.phone_call_agent.services.builder import build_pipeline
 
 
 async def call(phone_number: str) -> None:
@@ -35,4 +34,4 @@ async def call(phone_number: str) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(call())
+    asyncio.run(call(phone_number="+12488906977"))

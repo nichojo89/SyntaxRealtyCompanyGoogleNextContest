@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from pipecat.runner.daily import configure
 
-from phone_call_agent.config.settings import daily as cfg
+from agents.phone_call_agent.config.settings import daily as cfg
 
 
 @dataclass(frozen=True)
