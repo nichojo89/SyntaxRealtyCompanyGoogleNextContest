@@ -1,7 +1,7 @@
 import time
 import aiohttp
 from dataclasses import dataclass
-from virtual_assistant.phone_call_agent_as_tool.config.settings import daily as cfg
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import daily as cfg
 
 
 @dataclass(frozen=True)

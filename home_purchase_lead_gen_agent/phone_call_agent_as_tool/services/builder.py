@@ -13,11 +13,11 @@ from pipecat.pipeline.task import PipelineTask
 from pipecat.services.gemini_multimodal_live.gemini import GeminiVADParams
 from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMService
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
-from virtual_assistant.phone_call_agent_as_tool.config.settings import daily as daily_cfg
-from virtual_assistant.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
-from virtual_assistant.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
-from virtual_assistant.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
-from virtual_assistant.prompts import negotiate_deal_prompt
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import daily as daily_cfg
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
+from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
+from home_purchase_lead_gen_agent.prompts import negotiate_deal_prompt
 
 
 # ==========================================
