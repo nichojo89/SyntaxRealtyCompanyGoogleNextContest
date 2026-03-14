@@ -13,11 +13,11 @@ from pipecat.pipeline.task import PipelineTask
 from pipecat.services.gemini_multimodal_live.gemini import GeminiVADParams
 from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMService
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
-from agents.phone_call_agent.config.settings import daily as daily_cfg
-from agents.phone_call_agent.config.settings import gemini as gemini_cfg
-from agents.phone_call_agent.pipeline.daily_service import RoomInfo
-from agents.phone_call_agent.pipeline.twilio_service import TwilioService
-from prompts import negotiate_deal_prompt
+from virtual_assistant.phone_call_agent_as_tool.config.settings import daily as daily_cfg
+from virtual_assistant.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
+from virtual_assistant.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
+from virtual_assistant.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
+from virtual_assistant.prompts import negotiate_deal_prompt
 
 
 # ==========================================
@@ -114,17 +114,17 @@ def build_pipeline(
     task = PipelineTask(pipeline)
 
     @transport.event_handler("on_joined")
-    async def on_joined(transport, data):
+    async def on_joined(_, __):
         print("[Pipeline] Bot joined room — initiating Twilio bridge call...")
         await asyncio.to_thread(twilio.bridge_call, room.sip_uri, recipient_phone)
 
     @transport.event_handler("on_first_participant_joined")
-    async def on_first_participant_joined(transport, participant):
+    async def on_first_participant_joined(_, participant):
         name = participant.get("info", {}).get("userName", "unknown")
         print(f"[Pipeline] First participant joined: {name}")
 
     @transport.event_handler("on_participant_left")
-    async def on_participant_left(transport, participant, reason):
+    async def on_participant_left(_, __, reason):
         print(f"[Pipeline] Participant left ({reason}) — cancelling pipeline.")
         await task.cancel()
 

@@ -1,11 +1,7 @@
-import ssl
 import time
 import aiohttp
 from dataclasses import dataclass
-
-from pipecat.runner.daily import configure
-
-from agents.phone_call_agent.config.settings import daily as cfg
+from virtual_assistant.phone_call_agent_as_tool.config.settings import daily as cfg
 
 
 @dataclass(frozen=True)

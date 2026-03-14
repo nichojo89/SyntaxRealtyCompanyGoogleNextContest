@@ -1,7 +1,7 @@
 import re
 import webbrowser
 
-from agents.phone_call_agent.main import call
+from virtual_assistant.phone_call_agent_as_tool.main import call
 
 
 def open_url(url: str) -> str:

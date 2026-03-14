@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Annotated
 from pydantic import BaseModel, Field, AfterValidator
-from utils.datetime import parse_mm_dd_yyyy
+from virtual_assistant.utils.datetime import parse_mm_dd_yyyy
 
 
 class PropertyForSale(BaseModel):

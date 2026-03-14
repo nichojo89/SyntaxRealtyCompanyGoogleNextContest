@@ -5,3 +5,7 @@ pyngrok
 twilio
 playwright
 termcolor
+protobuf
+pipecat
+aiohttp
+pydantic
