@@ -1,14 +1,15 @@
 from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
 from google.adk.tools import AgentTool
 from google.adk.tools import google_search
-from home_purchase_lead_gen_agent.models.PropertyForSale import  PropertyDetailsList
-from home_purchase_lead_gen_agent.models.PropertyLead import  PropertyLeads
+
+from home_purchase_lead_gen_agent.models.LeadTextRequest import LeadTextRequest
 from home_purchase_lead_gen_agent.models.TextMessageEvaluation import TextMessageEvaluation
 from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, create_text_message_prompt, evaluate_text_message_prompt, lead_details_prompt)
 from home_purchase_lead_gen_agent.prompts.supervisor_prompt import get_supervisor_prompt
 from home_purchase_lead_gen_agent.tools.agent_tools import open_url, initiate_phone_call, send_text_message
 
 SUBAGENT_MODEL = "gemini-2.5-flash"
+SUBAGENT_LITE_MODEL = "gemini-2.5-flash-lite"
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 BOT_NAME = "Evelyn"
 
@@ -131,19 +132,24 @@ def _build_multi_agent() -> LlmAgent | None:
             name="ContentCreatorSubAgent",
             model=SUBAGENT_MODEL,
             instruction=create_text_message_prompt.prompt,
-            output_key="pitch_draft"
+            output_key="pitch_draft",
+            input_schema=LeadTextRequest
         )
 
         content_reviewer_subagent = LlmAgent(
             name="ContentReviewerSubAgent",
-            model=SUBAGENT_MODEL,
+            model=SUBAGENT_LITE_MODEL,
             instruction=evaluate_text_message_prompt.prompt,
             tools=[exit_loop],
-            output_schema=TextMessageEvaluation
+            # output_schema=TextMessageEvaluation
+
+            output_key="text_message_to_send"
         )
+
 
         marketing_content_loop_agent = LoopAgent(
             name="MarketingContentLoopAgent",
+            description="Drafts and refines a marketing text message. You must pass the selected lead's property_address, owner_name, and time_on_market to this tool.",
             sub_agents=[content_creator_subagent, content_reviewer_subagent],
             max_iterations=4
         )

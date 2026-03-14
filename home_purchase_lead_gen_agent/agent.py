@@ -6,6 +6,7 @@ from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.tools import AgentTool
 from google.adk.tools import google_search
 
+from home_purchase_lead_gen_agent.models.LeadTextRequest import LeadTextRequest
 from home_purchase_lead_gen_agent.models.PropertyForSale import PropertyDetailsList
 from home_purchase_lead_gen_agent.models.TextMessageEvaluation import TextMessageEvaluation
 from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, lead_details_prompt, create_text_message_prompt, evaluate_text_message_prompt)
@@ -58,15 +59,16 @@ def _build_multi_agent() -> LlmAgent | None:
         # Loop Agent ❥ Create text message to home-owner ♡
         #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
 
-        def exit_loop() -> str:
-            """Terminates the loop when text message evaluation score is 90 or above."""
-            return "LOOP_TERMINATED_SUCCESSFULLY"
+        def exit_loop(final_text_message: str) -> str:
+            """Terminates the loop when text message evaluation score is 90 or above. You MUST pass the final text message into this tool."""
+            return f"FINAL_APPROVED_TEXT: {final_text_message}"
 
         content_creator_subagent = LlmAgent(
             name="ContentCreatorSubAgent",
             model=SUBAGENT_MODEL,
             instruction=create_text_message_prompt.prompt,
-            output_key="pitch_draft"
+            # input_schema=LeadTextRequest,
+            output_key="text_draft"
         )
 
         content_reviewer_subagent = LlmAgent(
@@ -74,11 +76,13 @@ def _build_multi_agent() -> LlmAgent | None:
             model=SUBAGENT_MODEL,
             instruction=evaluate_text_message_prompt.prompt,
             tools=[exit_loop],
-            output_schema=TextMessageEvaluation
+            # output_schema=TextMessageEvaluation
+            output_key="text_message_to_send"
         )
 
         marketing_content_loop_agent = LoopAgent(
             name="MarketingContentLoopAgent",
+            description="Drafts and refines a marketing text message. You must pass the selected lead's sale_property_address and property_sale_listing_date to this tool.",
             sub_agents=[content_creator_subagent, content_reviewer_subagent],
             max_iterations=4
         )
