@@ -1,3 +1,4 @@
+from google.adk.agents.callback_context import CallbackContext
 from google.genai import types
 from google.genai.types import Modality
 from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
@@ -30,13 +31,25 @@ def _build_multi_agent() -> LlmAgent | None:
         # Sequential Agent ❥ Get leads and contact information for leads ♡
         #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
 
+        def log_lead_listings(context: CallbackContext, *args, **kwargs):
+            """Callback to peek at the state after the agent finishes."""
+            print("\n" + "=" * 50)
+            print("🕵️ DEBUG: lead_gen_subagent Output (PropertyForSale):")
+            # Retrieve the exact structured data saved to the output_key
+            print(context.state.get("lead_listings"))
+            print(args)
+            print(kwargs)
+            print("=" * 50 + "\n")
+
         lead_gen_subagent = LlmAgent(
             name="LeadGenerationSubAgent",
             model=SUBAGENT_MODEL,
             instruction=lead_generation_prompt.prompt,
             tools=[google_search],
             output_schema=PropertyForSale,
-            output_key="lead_listings"
+            output_key="lead_listings",
+            before_agent_callback=log_lead_listings,
+            after_agent_callback=log_lead_listings
         )
 
         homeowner_details_subagent = LlmAgent(
@@ -87,6 +100,7 @@ def _build_multi_agent() -> LlmAgent | None:
 
         supervisor = LlmAgent(
             name="Evelyn",
+            # model=SUPERVISOR_MODEL,
             model=SUPERVISOR_MODEL,
             instruction=get_supervisor_prompt(bot_name=BOT_NAME),
             tools=[
@@ -112,7 +126,7 @@ run_config = RunConfig(
     ),
     response_modalities=[Modality.AUDIO, Modality.TEXT],
     streaming_mode=StreamingMode.BIDI,
-    max_llm_calls=1000,
+    max_llm_calls=1_000,
 )
 supervisor_evelyn = _build_multi_agent()
 if supervisor_evelyn:
