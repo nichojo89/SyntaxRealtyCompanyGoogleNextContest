@@ -5,9 +5,10 @@ from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.tools import AgentTool
 from google.adk.tools import google_search
-from home_purchase_lead_gen_agent.models.PropertyForSale import PropertyForSale
+
+from home_purchase_lead_gen_agent.models.PropertyForSale import PropertyDetailsList
 from home_purchase_lead_gen_agent.models.TextMessageEvaluation import TextMessageEvaluation
-from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, home_owner_details_prompt, create_text_message_prompt, evaluate_text_message_prompt)
+from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, lead_details_prompt, create_text_message_prompt, evaluate_text_message_prompt)
 from home_purchase_lead_gen_agent.prompts.supervisor_prompt import get_supervisor_prompt
 from home_purchase_lead_gen_agent.tools.agent_tools import open_url, initiate_phone_call
 
@@ -31,38 +32,26 @@ def _build_multi_agent() -> LlmAgent | None:
         # Sequential Agent ❥ Get leads and contact information for leads ♡
         #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
 
-        def log_lead_listings(context: CallbackContext, *args, **kwargs):
-            """Callback to peek at the state after the agent finishes."""
-            print("\n" + "=" * 50)
-            print("🕵️ DEBUG: lead_gen_subagent Output (PropertyForSale):")
-            # Retrieve the exact structured data saved to the output_key
-            print(context.state.get("lead_listings"))
-            print(args)
-            print(kwargs)
-            print("=" * 50 + "\n")
-
         lead_gen_subagent = LlmAgent(
             name="LeadGenerationSubAgent",
             model=SUBAGENT_MODEL,
             instruction=lead_generation_prompt.prompt,
             tools=[google_search],
-            output_schema=PropertyForSale,
-            output_key="lead_listings",
-            before_agent_callback=log_lead_listings,
-            after_agent_callback=log_lead_listings
+            output_schema=PropertyDetailsList,
+            output_key="lead_listings"
         )
 
-        homeowner_details_subagent = LlmAgent(
-            name="HomeownerDetailsSubAgent",
+        lead_extraction_subagent = LlmAgent(
+            name="LeadExtractionSubAgent",
             model=SUBAGENT_MODEL,
-            instruction=home_owner_details_prompt.prompt,
-            tools=[google_search],
-            output_key="enriched_leads"
+            instruction=lead_details_prompt.prompt,
+            output_schema=PropertyDetailsList,
+            output_key="lead_listings"  # Outputs structured PropertyForSale data
         )
 
         lead_generation_sequential_agent = SequentialAgent(
             name="LeadGenerationSequentialAgent",
-            sub_agents=[lead_gen_subagent, homeowner_details_subagent]
+            sub_agents=[lead_gen_subagent, lead_extraction_subagent]
         )
 
         #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡

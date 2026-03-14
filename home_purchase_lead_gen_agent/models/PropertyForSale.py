@@ -3,8 +3,7 @@ from typing import Annotated, Optional
 from pydantic import BaseModel, Field, AfterValidator
 from home_purchase_lead_gen_agent.utils.datetime import parse_mm_dd_yyyy
 
-
-class PropertyForSale(BaseModel):
+class PropertyDetails(BaseModel):
     sale_property_address: str = Field(
         description="Address of the property",
         alias="SALE_PROPERTY_ADDRESS",
@@ -25,10 +24,10 @@ class PropertyForSale(BaseModel):
         alias="SALE_PROPERTY_CONDITION",
         default="Unknown"
     )
-    sale_property_acquired_by_owner_amount: str = Field(
+    sale_property_acquired_by_owner_amount: Optional[str] = Field(
         description="Amount the owner acquired the property for",
         alias="SALE_PROPERTY_ACQUIRED_BY_OWNER_AMOUNT",
-        default="Not listed"
+        default=None
     )
     sale_property_acquired_by_owner_year: Optional[int] = Field(
         description="Year the owner acquired the property. Leave null if not listed.",
@@ -40,38 +39,20 @@ class PropertyForSale(BaseModel):
         alias="SOURCE_URL",
         default="Not listed"
     )
+    phone_number: Optional[str] = Field(
+        description="phone number for the contact on the listing page",
+        alias="PHONE_NUMBER",
+        default="Not listed"
+    )
     local_rent_estimation: str = Field(
         description="Local rent estimation",
         alias="LOCAL_RENT_ESTIMATION",
         default="Not listed"
     )
-    comparable_property_address: str = Field(
-        description="Comparable property address",
-        alias="COMPARABLE_PROPERTY_ADDRESS",
-        default="Not listed"
-    )
-    buyers_name: str = Field(
-        description="Buyer's name or realtor name",
-        alias="BUYERS_NAME",
-        default="Not listed"
-    )
-    buyers_loan_application_amount: str = Field(
-        description="Buyer's loan application amount",
-        alias="BUYERS_LOAN_APPLICATION_AMOUNT",
-        default="Not listed"
-    )
-    buyers_loan_amount: str = Field(
-        description="Buyer's loan amount",
-        alias="BUYERS_LOAN_AMOUNT",
-        default="Not listed"
-    )
-    buyers_down_payment: str = Field(
-        description="Buyer's down payment",
-        alias="BUYERS_DOWN_PAYMENT",
-        default="Not listed"
-    )
-    low_ball_amount: str = Field(
-        description="Low ball offer amount",
-        alias="LOW_BALL_AMOUNT",
-        default="Not listed"
+
+class PropertyDetailsList(BaseModel):
+    properties: list[PropertyDetails] = Field(
+        description="List of all properties",
+        alias="PROPERTIES",
+        default=[]
     )
