@@ -1,0 +1,7 @@
+google-adk
+pipecat-ai[daily, google,silero]==0.0.90
+python-dotenv
+pyngrok
+twilio
+playwright
+termcolor
