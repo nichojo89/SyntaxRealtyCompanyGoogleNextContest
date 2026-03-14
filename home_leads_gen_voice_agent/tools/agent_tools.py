@@ -2,8 +2,8 @@ import asyncio
 import re
 import webbrowser
 
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.main import call
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.main import call
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
 
 
 def open_url(url: str) -> str:

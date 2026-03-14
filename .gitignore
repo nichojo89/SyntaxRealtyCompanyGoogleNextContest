@@ -45,9 +45,12 @@ venv.bak/
 # secrets/API keys
 .env
 .env.*
+*/.env.*
 !.env.example
 *.pem
 secrets.yaml
+home_leads_gen_text_agent/.env
+home_leads_gen_voice_agent/.env/
 
 # Unit Testing & Coverage
 .tox/

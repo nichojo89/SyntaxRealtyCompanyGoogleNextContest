@@ -13,12 +13,12 @@ from pipecat.pipeline.task import PipelineTask
 from pipecat.services.gemini_multimodal_live.gemini import GeminiVADParams
 from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMService
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import daily as daily_cfg
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
-from home_purchase_lead_gen_agent.prompts import negotiate_deal_prompt
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import daily as daily_cfg
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.daily_service import RoomInfo
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
+from home_leads_gen_voice_agent.prompts import negotiate_deal_prompt
 
 
 # ==========================================

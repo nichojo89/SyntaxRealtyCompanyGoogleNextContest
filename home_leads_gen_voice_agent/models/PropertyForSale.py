@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Annotated, Optional
 from pydantic import BaseModel, Field, AfterValidator
-from home_purchase_lead_gen_agent.utils.datetime import parse_mm_dd_yyyy
+from home_leads_gen_voice_agent.utils.datetime import parse_mm_dd_yyyy
 
 class PropertyDetails(BaseModel):
     sale_property_address: str = Field(

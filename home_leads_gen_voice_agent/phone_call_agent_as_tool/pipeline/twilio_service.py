@@ -6,7 +6,7 @@ Connects a human over telephone and an LLM inside a WebRTC room via Daily SIP en
 
 import time
 from twilio.rest import Client
-from home_purchase_lead_gen_agent.phone_call_agent_as_tool.config.settings import twilio as cfg
+from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import twilio as cfg
 
 
 class TwilioService:
