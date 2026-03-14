@@ -13,7 +13,7 @@ from phone_call_agent.pipeline.twilio_service import TwilioService
 from phone_call_agent.services.builder import build_pipeline
 
 
-async def main() -> None:
+async def call(phone_number: str) -> None:
     room_name = f"VoiceBot-{int(time.time())}"
 
     daily_svc = DailyService()
@@ -26,7 +26,7 @@ async def main() -> None:
         room=room,
         owner_token=owner_token,
         twilio=twilio_svc,
-        recipient_phone=twilio_cfg.recipient_phone,
+        recipient_phone=phone_number,
     )
 
     print("Starting pipeline runner...")
@@ -35,4 +35,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(call())

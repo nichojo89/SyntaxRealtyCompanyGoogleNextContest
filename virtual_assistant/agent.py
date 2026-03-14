@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Annotated
+from typing import Annotated, re
 
 from google.genai import types
 from google.genai.types import Modality
@@ -9,6 +9,8 @@ from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
 from google.adk.agents.run_config import RunConfig, StreamingMode
 from google.adk.tools import AgentTool
 from google.adk.tools import google_search
+
+from phone_call_agent.main import call
 
 
 # ==============================================================================
@@ -194,14 +196,49 @@ import webbrowser
 
 
 def open_url(url: str) -> str:
-    """Opens a URL in the default system browser."""
+    """
+    Use this tool whenever the user asks to open a website, visit a webpage, go to a specific link, or view a property listing in their browser.
+
+    Args:
+        url (str): The exact web address to open. MUST be a raw, fully qualified URL starting with 'https://'.
+            Do NOT wrap the URL in markdown format (e.g., never send [Google](https://google.com), just send 'https://www.google.com').
+            If the user asks to open a known website by its name (e.g., 'Open Zillow' or 'Go to Syntax Realty'),
+            you must infer the proper URL and pass the raw web address.
+    """
     # Sanitize common LLM URL mistakes
     if not url.startswith("http://") and not url.startswith("https://"):
         url = "https://" + url
     url = url.replace("https.", "https://").replace("http.", "http://")
 
     webbrowser.open(url)
-    return f"Opened {url} in the default browser."
+    return f"Successfully opened {url} in the default browser."
+
+
+async def make_phone_call(phone_number: str) -> str:
+    """
+    Use this tool whenever the user asks you to call someone, make a phone call, or connect them to a number via audio.
+
+    Args:
+        phone_number (str): The phone number to dial. MUST be in strict E.164 format.
+            It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada),
+            and the subscriber number. You must remove all spaces, dashes, and parentheses.
+            Example: If the user says '(248) 890-6977', you MUST pass '+12488906977'.
+            If the user does not provide a country code, assume it is US/Canada (+1).
+    """
+    # Validate strict E.164 format (Starts with '+', followed by 1 to 15 digits)
+    if not re.match(r"^\+[1-9]\d{1,14}$", phone_number):
+        return (
+            f"ERROR: You passed '{phone_number}', which is invalid. "
+            "You MUST use strict E.164 format. Do not ask the user for clarification yet. "
+            "Instead, immediately fix the format yourself by stripping all spaces, dashes, and parentheses, "
+            "ensure it starts with '+' and the country code (e.g., +1), and call this tool again."
+        )
+
+    print(f"Calling: {phone_number}")
+    await call(phone_number=phone_number)
+
+    # Return success message to the LLM so it knows the tool finished successfully
+    return f"Successfully initiated the call to {phone_number}."
 
 # ==============================================================================
 # Supervisor Agent — Evelyn (native audio)
@@ -216,6 +253,7 @@ supervisor_evelyn = LlmAgent(
     instruction="""You are Evelyn, an elite Real Estate Multi-Agent Supervisor.
 Your job is to orchestrate tasks by calling your agent tools. DO NOT attempt to find leads yourself.
 If asked, you can also browse the web using the ComputerUseSubAgent.
+You can call phone numbers using the make_phone_call tool.
 
 FOLLOW THIS EXACT WORKFLOW:
 1. Greet the user and ask what city/location they want FSBO leads for.
@@ -230,6 +268,7 @@ Maintain a warm, professional, and confident voice. Be concise.
         AgentTool(agent=lead_generation_sequential_agent),
         AgentTool(agent=marketing_content_loop_agent),
         open_url,
+        make_phone_call
     ],
 )
 

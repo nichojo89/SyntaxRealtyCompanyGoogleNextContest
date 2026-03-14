@@ -16,7 +16,6 @@ _REQUIRED_VARS = [
     "TWILIO_ACCOUNT_SID",
     "TWILIO_AUTH_TOKEN",
     "TWILIO_CALLER_ID",
-    "RECIPIENT_PHONE_NUMBER",
     "GOOGLE_API_KEY"
 ]
 
@@ -49,7 +48,6 @@ class TwilioSettings:
     account_sid: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     auth_token: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     caller_id: str = os.getenv("TWILIO_CALLER_ID", "")
-    recipient_phone: str = os.getenv("RECIPIENT_PHONE_NUMBER", "")
 
 
 @dataclass(frozen=True)
