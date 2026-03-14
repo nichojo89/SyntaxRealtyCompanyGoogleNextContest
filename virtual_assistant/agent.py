@@ -6,8 +6,8 @@ from google.adk.tools import AgentTool
 from google.adk.tools import google_search
 from virtual_assistant.models.PropertyForSale import PropertyForSale
 from virtual_assistant.models.TextMessageEvaluation import TextMessageEvaluation
-from prompts import (lead_generation_prompt, home_owner_details_prompt, create_text_message_prompt, evaluate_text_message_prompt, supervisor_prompt)
-from tools.agent_tools import open_url, make_phone_call
+from virtual_assistant.prompts import (lead_generation_prompt, home_owner_details_prompt, create_text_message_prompt, evaluate_text_message_prompt, supervisor_prompt)
+from virtual_assistant.tools.agent_tools import open_url, make_phone_call
 
 
 def exit_loop() -> str:
