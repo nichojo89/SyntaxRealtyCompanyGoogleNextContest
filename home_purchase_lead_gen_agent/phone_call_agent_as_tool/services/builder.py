@@ -1,7 +1,7 @@
 """
 Pipecat pipeline factory.
 
-Builds the audio pipeline (Daily transport ❧ Gemini LLM ❧ Daily transport)
+Builds the audio pipeline (Daily transport ❥ Gemini LLM ❥ Daily transport)
 and wires the lifecycle event handlers that drive the Twilio bridge call.
 """
 

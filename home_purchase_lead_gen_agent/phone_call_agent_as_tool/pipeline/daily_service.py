@@ -52,7 +52,7 @@ class DailyService:
             raise RuntimeError("Daily Room created but SIP URI is missing.")
 
         room = RoomInfo(url=data["url"], sip_uri=f"sip:{sip_endpoint}")
-        print(f"Daily room ready ❧ url={room.url}  sip={room.sip_uri}")
+        print(f"Daily room ready ❥ url={room.url}  sip={room.sip_uri}")
         return room
 
     async def create_owner_token(self, room_name: str) -> str:

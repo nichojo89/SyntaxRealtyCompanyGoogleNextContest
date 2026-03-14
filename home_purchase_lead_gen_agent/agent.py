@@ -14,10 +14,20 @@ SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 BOT_NAME = "Evelyn"
 
 def _build_multi_agent() -> LlmAgent | None:
+    """
+    Builds Multi-AgentSystem designed to find homes for sale that have been on the market for a long period of time.
+
+    Users can perform the following tasks:
+    ❥ View home listings found by the LLMs in a browser.
+    ❥ Call the owner of the home with an AI voice assistant
+    ❥ Send a carefully crafted text message to the owner of the home.
+
+    returns: root agent.
+    """
     try:
-        ##################################################################
-        # Sequential Agent - Get leads and contact information for leads #
-        ##################################################################
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
+        # Sequential Agent ❥ Get leads and contact information for leads ♡
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
 
         lead_gen_subagent = LlmAgent(
             name="LeadGenerationSubAgent",
@@ -41,9 +51,9 @@ def _build_multi_agent() -> LlmAgent | None:
             sub_agents=[lead_gen_subagent, homeowner_details_subagent]
         )
 
-        ##################################################
-        # Loop Agent - Create text message to home-owner #
-        ##################################################
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
+        # Loop Agent ❥ Create text message to home-owner ♡
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
 
         def exit_loop() -> str:
             """Terminates the loop when text message evaluation score is 90 or above."""
@@ -70,9 +80,9 @@ def _build_multi_agent() -> LlmAgent | None:
             max_iterations=4
         )
 
-        ###################################
-        # Supervisor - Multi-Agent System #
-        ###################################
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇
+        # Supervisor - Multi-Agent System ◇
+        #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇
 
         supervisor = LlmAgent(
             name="Evelyn",

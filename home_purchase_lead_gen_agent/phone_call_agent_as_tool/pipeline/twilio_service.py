@@ -29,14 +29,14 @@ class TwilioService:
             from_=cfg.caller_id,
             twiml=twiml,
         )
-        print(f"Twilio ❧ Recipient call — sid={recipient_call.sid}  status={recipient_call.status}")
+        print(f"Twilio ❥ Recipient call — sid={recipient_call.sid}  status={recipient_call.status}")
 
         bot_call = self._client.calls.create(
             to=daily_sip_uri,
             from_=cfg.caller_id,
             twiml=twiml,
         )
-        print(f"Twilio ❧ Bot call — sid={bot_call.sid}  status={bot_call.status}")
+        print(f"Twilio ❥ Bot call — sid={bot_call.sid}  status={bot_call.status}")
 
         return recipient_call.sid
 
@@ -44,9 +44,9 @@ class TwilioService:
     def _build_conference_twiml(conference_name: str) -> str:
         """
         Build TwiML that drops a caller into a silent conference room.
-        ❧ waitUrl: absolute silence instead of hold music
-        ❧ beep: no entry chime when bot connects
-        ❧ endConferenceOnExit: conference ends when either party hangs up
+        ❥ waitUrl: absolute silence instead of hold music
+        ❥ beep: no entry chime when bot connects
+        ❥ endConferenceOnExit: conference ends when either party hangs up
         """
 
         return (
