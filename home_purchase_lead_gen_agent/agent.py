@@ -6,8 +6,9 @@ from google.adk.tools import AgentTool
 from google.adk.tools import google_search
 from home_purchase_lead_gen_agent.models.PropertyForSale import PropertyForSale
 from home_purchase_lead_gen_agent.models.TextMessageEvaluation import TextMessageEvaluation
-from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, home_owner_details_prompt, create_text_message_prompt, evaluate_text_message_prompt, supervisor_prompt)
-from home_purchase_lead_gen_agent.tools.agent_tools import open_url, make_phone_call
+from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, home_owner_details_prompt, create_text_message_prompt, evaluate_text_message_prompt)
+from home_purchase_lead_gen_agent.prompts.supervisor_prompt import get_supervisor_prompt
+from home_purchase_lead_gen_agent.tools.agent_tools import open_url, initiate_phone_call
 
 SUBAGENT_MODEL = "gemini-2.5-flash"
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
@@ -87,17 +88,17 @@ def _build_multi_agent() -> LlmAgent | None:
         supervisor = LlmAgent(
             name="Evelyn",
             model=SUPERVISOR_MODEL,
-            instruction=supervisor_prompt.prompt,
+            instruction=get_supervisor_prompt(bot_name=BOT_NAME),
             tools=[
                 AgentTool(agent=lead_generation_sequential_agent),
                 AgentTool(agent=marketing_content_loop_agent),
                 open_url,
-                make_phone_call
+                initiate_phone_call
             ],
         )
         return supervisor
     except Exception as e:
-        print(f'‼️ Error building home leads multi-agent system {e}')
+        print(f'‼️Error building home leads multi-agent system {e}')
 
 # Adds runtime behaviors for speech
 run_config = RunConfig(

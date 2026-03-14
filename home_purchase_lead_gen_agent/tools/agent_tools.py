@@ -1,3 +1,4 @@
+import asyncio
 import re
 import webbrowser
 
@@ -23,20 +24,16 @@ def open_url(url: str) -> str:
     return f"Successfully opened {url} in the default browser."
 
 
-async def make_phone_call(phone_number: str) -> str:
+async def initiate_phone_call(phone_number: str) -> str:
     """
     Use this tool whenever the user asks you to call someone, make a phone call, or connect them to a number via audio.
 
     Args:
         phone_number (str): The phone number to dial. MUST be in strict E.164 format.
-            It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada),
-            and the subscriber number. You must remove all spaces, dashes, and parentheses.
-            Example: If the user says '(248) 890-6977', you MUST pass '+12488906977'.
-            If the user does not provide a country code, assume it is US/Canada (+1).
-
-    CRITICAL INSTRUCTION:
-    Once you receive a success message from this tool, DO NOT call it again. Immediately
-    speak to the user out loud to confirm the call has been placed.
+        It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada),
+        and the subscriber number. You must remove all spaces, dashes, and parentheses.
+        Example, If the user says '(248) 890-6977', you MUST pass '+12488906977'.
+        If the user does not provide a country code, assume it is US/Canada (+1).
     """
     # Validate strict E.164 format (Starts with '+', followed by 1 to 15 digits)
     if not re.match(r"^\+[1-9]\d{1,14}$", phone_number):
@@ -47,8 +44,7 @@ async def make_phone_call(phone_number: str) -> str:
             "ensure it starts with '+' and the country code (e.g., +1), and call this tool again."
         )
 
-    print(f"Calling: {phone_number}")
-    await call(phone_number=phone_number)
+    print(f"Calling: {phone_number} 📲")
+    asyncio.create_task(call(phone_number=phone_number))
 
-    # Inform the LLM that the tool finished and give it a strict command to speak to the user
-    return f"Successfully initiated the call to {phone_number}. ACTION REQUIRED: Do not call this tool again. Tell the user the call is connecting."
+    return f"Successfully initiated the call to {phone_number}."
