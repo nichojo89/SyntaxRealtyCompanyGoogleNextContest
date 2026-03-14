@@ -6,7 +6,7 @@ from home_purchase_lead_gen_agent.models.PropertyLead import  PropertyLeads
 from home_purchase_lead_gen_agent.models.TextMessageEvaluation import TextMessageEvaluation
 from home_purchase_lead_gen_agent.prompts import (lead_generation_prompt, create_text_message_prompt, evaluate_text_message_prompt, lead_details_prompt)
 from home_purchase_lead_gen_agent.prompts.supervisor_prompt import get_supervisor_prompt
-from home_purchase_lead_gen_agent.tools.agent_tools import open_url, initiate_phone_call
+from home_purchase_lead_gen_agent.tools.agent_tools import open_url, initiate_phone_call, send_text_message
 
 SUBAGENT_MODEL = "gemini-2.5-flash"
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
@@ -116,7 +116,7 @@ def _build_multi_agent() -> LlmAgent | None:
 
         lead_generation_sequential_agent = SequentialAgent(
             name="LeadGenerationSequentialAgent",
-            sub_agents=[lead_search_subagent, log_agent, lead_extraction_subagent]
+            sub_agents=[lead_search_subagent, log_agent, lead_extraction_subagent],
         )
 
         # ♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡
@@ -162,7 +162,8 @@ def _build_multi_agent() -> LlmAgent | None:
                 AgentTool(agent=lead_generation_sequential_agent),
                 AgentTool(agent=marketing_content_loop_agent),
                 open_url,
-                initiate_phone_call
+                initiate_phone_call,
+                send_text_message
             ],
         )
         return supervisor

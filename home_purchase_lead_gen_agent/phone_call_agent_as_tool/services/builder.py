@@ -42,19 +42,16 @@ def ensure_playwright_browsers():
 ensure_playwright_browsers()
 
 
-def _get_system_instruction() -> str:
+def _get_voice_call_system_instruction() -> str:
     """
     Gets system instruction from the to negotiate deals for homes that have been listed online for a long time.
 
     Returns: system_instruction
     """
-    bot_name = "Jebadiah"
+    bot_name = "Benjamin"
     realtor_name = "Emily West"
     realty_company = "Syntax Realty Company"
-    prompt = (negotiate_deal_prompt.prompt
-              .replace("ASSISTANT_NAME", bot_name)
-              .replace("REALTOR_NAME", realtor_name)
-              .replace("REALTOR_COMPANY", realty_company))
+    prompt = (negotiate_deal_prompt.get_negotiation_prompt(bot_name=bot_name, realtor_name=realtor_name, realty_company=realty_company))
 
     return prompt
 
@@ -80,7 +77,7 @@ def build_transport(room: RoomInfo, owner_token: str) -> DailyTransport:
 def build_llm() -> GeminiLiveLLMService:
     """Builds the Gemini Live LLM service."""
 
-    prompt = _get_system_instruction()
+    prompt = _get_voice_call_system_instruction()
 
     return GeminiLiveLLMService(
         api_key=gemini_cfg.gemini_api_key,  # Use api_key instead of credentials
