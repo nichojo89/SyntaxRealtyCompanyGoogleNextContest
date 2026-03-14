@@ -9,3 +9,4 @@ protobuf
 pipecat
 aiohttp
 pydantic
+fastapi
