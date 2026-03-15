@@ -1,6 +1,105 @@
-import httpx
+from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.adk.tools import google_search
+from google.genai import types as genai_types
+from home_leads_gen_voice_agent.prompts import (
+    lead_generation_prompt,
+    lead_details_prompt,
+    create_text_message_prompt,
+    evaluate_text_message_prompt
+)
 
-BASE_URL = "http://127.0.0.1:8001/pipeline"
+SUBAGENT_MODEL = "gemini-2.5-flash"
+
+_lead_gen_runner: Runner | None = None
+_lead_gen_session_service: InMemorySessionService | None = None
+_marketing_runner: Runner | None = None
+_marketing_session_service: InMemorySessionService | None = None
+
+
+def _get_lead_gen_runner() -> tuple[Runner, InMemorySessionService]:
+    global _lead_gen_runner, _lead_gen_session_service
+    if _lead_gen_runner is None:
+        lead_gen_subagent = LlmAgent(
+            name="LeadGenerationSubAgent",
+            model=SUBAGENT_MODEL,
+            instruction=lead_generation_prompt.prompt,
+            tools=[google_search],
+            output_key="for_sale_by_owner_lead_listings"
+        )
+        lead_extraction_subagent = LlmAgent(
+            name="LeadExtractionSubAgent",
+            model=SUBAGENT_MODEL,
+            instruction=lead_details_prompt.prompt
+        )
+        sequential_agent = SequentialAgent(
+            name="LeadGenerationSequentialAgent",
+            sub_agents=[lead_gen_subagent, lead_extraction_subagent]
+        )
+        _lead_gen_session_service = InMemorySessionService()
+        _lead_gen_runner = Runner(
+            agent=sequential_agent,
+            app_name="LeadGenerationSequentialAgent",
+            session_service=_lead_gen_session_service
+        )
+    return _lead_gen_runner, _lead_gen_session_service
+
+
+def _get_marketing_runner() -> tuple[Runner, InMemorySessionService]:
+    global _marketing_runner, _marketing_session_service
+    if _marketing_runner is None:
+        def exit_loop() -> str:
+            """Terminates the loop when text message evaluation score is 90 or above."""
+            return "LOOP_TERMINATED_SUCCESSFULLY"
+
+        content_creator_subagent = LlmAgent(
+            name="ContentCreatorSubAgent",
+            model=SUBAGENT_MODEL,
+            instruction=create_text_message_prompt.prompt,
+            output_key="pitch_draft"
+        )
+        content_reviewer_subagent = LlmAgent(
+            name="ContentReviewerSubAgent",
+            model=SUBAGENT_MODEL,
+            instruction=evaluate_text_message_prompt.prompt,
+            tools=[exit_loop],
+        )
+        loop_agent = LoopAgent(
+            name="MarketingContentLoopAgent",
+            sub_agents=[content_creator_subagent, content_reviewer_subagent],
+            max_iterations=4
+        )
+        _marketing_session_service = InMemorySessionService()
+        _marketing_runner = Runner(
+            agent=loop_agent,
+            app_name="MarketingContentLoopAgent",
+            session_service=_marketing_session_service
+        )
+    return _marketing_runner, _marketing_session_service
+
+
+async def _run_agent(runner: Runner, session_service: InMemorySessionService, message: str) -> str:
+    session = await session_service.create_session(
+        app_name=runner.agent.name,
+        user_id="evelyn"
+    )
+    user_message = genai_types.Content(
+        role="user",
+        parts=[genai_types.Part(text=message)]
+    )
+    result_parts = []
+    async for event in runner.run_async(
+        user_id="evelyn",
+        session_id=session.id,
+        new_message=user_message
+    ):
+        if event.content and event.content.parts:
+            for part in event.content.parts:
+                if part.text:
+                    result_parts.append(part.text)
+
+    return "\n".join(result_parts) if result_parts else "No results returned."
 
 
 async def run_lead_generation(location: str, criteria: str) -> str:
@@ -12,13 +111,12 @@ async def run_lead_generation(location: str, criteria: str) -> str:
         location (str): The city, state, or zip code to search in.
         criteria (str): Any additional search criteria such as price range, property type, or days on market.
     """
-    async with httpx.AsyncClient(timeout=180.0) as client:
-        response = await client.post(
-            f"{BASE_URL}/lead-generation",
-            json={"location": location, "criteria": criteria}
-        )
-        response.raise_for_status()
-        return response.json()["result"]
+    runner, session_service = _get_lead_gen_runner()
+    return await _run_agent(
+        runner,
+        session_service,
+        f"Find homes for sale in {location}. Criteria: {criteria}"
+    )
 
 
 async def run_marketing_content(sale_property_address: str, sale_property_sale_listing_date: str = None) -> str:
@@ -30,13 +128,9 @@ async def run_marketing_content(sale_property_address: str, sale_property_sale_l
         sale_property_address (str): The full address of the property to generate a pitch for.
         sale_property_sale_listing_date (str): The date the property was listed for sale.
     """
-    async with httpx.AsyncClient(timeout=180.0) as client:
-        response = await client.post(
-            f"{BASE_URL}/marketing-content",
-            json={
-                "sale_property_address": sale_property_address,
-                "sale_property_sale_listing_date": sale_property_sale_listing_date
-            }
-        )
-        response.raise_for_status()
-        return response.json()["result"]
+    runner, session_service = _get_marketing_runner()
+    return await _run_agent(
+        runner,
+        session_service,
+        f"Create a text message pitch for this property: address={sale_property_address}, listing_date={sale_property_sale_listing_date}"
+    )

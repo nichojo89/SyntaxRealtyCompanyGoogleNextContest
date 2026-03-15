@@ -1,3 +1,4 @@
+import socket
 import threading
 import uvicorn
 from google.genai import types
@@ -6,18 +7,26 @@ from google.adk.agents.run_config import RunConfig, StreamingMode
 
 from home_leads_gen_voice_agent.api.server import app
 from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_prompt
-from home_leads_gen_voice_agent.tools.agent_tools import  initiate_phone_call
+from home_leads_gen_voice_agent.tools.agent_tools import initiate_phone_call
 from home_leads_gen_voice_agent.tools.pipeline_tools import run_lead_generation, run_marketing_content
 
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 BOT_NAME = "Evelyn"
 
+
+def _port_in_use(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('127.0.0.1', port)) == 0
+
+
 def _start_pipeline_server():
-    """Starts FastAPI server because we seng SubAgent calls via HTTP instead of AgentTool"""
+    """Starts FastAPI server because we send SubAgent calls via HTTP instead of AgentTool"""
     uvicorn.run(app, host="127.0.0.1", port=8001, log_level="warning")
 
-thread = threading.Thread(target=_start_pipeline_server, daemon=True)
-thread.start()
+
+if not _port_in_use(8001):
+    thread = threading.Thread(target=_start_pipeline_server, daemon=True)
+    thread.start()
 
 #♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇
 # Supervisor - Multi-Agent System ◇
