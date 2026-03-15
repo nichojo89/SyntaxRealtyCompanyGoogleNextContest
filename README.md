@@ -4,8 +4,8 @@ A lead generation and outreach tool used to find For-Sale-By-Owner for any given
 ### Examples
 - Assistants will try to find you home For-Sale-By-Owner (FSBO) for a given location.
 - You can ask the assistant to make AI phone calls to the home-owner.
-- You can ask the assistant to open home listings in a browser.
 - You can ask the assistant to send `carefully` crafted text messages to the home-owner.
+- You can use text or voice assistant agents. Please note, you **CAN NOT** try to send text to the voice agent, please use the microphone.
 
 ### Setup Instructions
 - Use a Python 3.11 interpreter for best compatibility.
@@ -69,8 +69,7 @@ gcloud run deploy syntax-realty \
   --port 8000 \
   --memory 2Gi \
   --cpu 2 \
-  --timeout 3600 \
-  --session-affinity
+  --timeout 300 \
   --set-env-vars GOOGLE_CLOUD_PROJECT=promptoptmizer,ENVIRONMENT=production \
   --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest \
   --set-secrets GOOGLE_GENAI_USE_VERTEXAI=GOOGLE_GENAI_USE_VERTEXAI:latest

@@ -63,7 +63,7 @@ async def initiate_phone_call(
     You are required to read your context window to understand what values to pass for parameters.
 
     Args:
-        phone_number (str): The phone number to dial. MUST be in strict E.164 format. It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada), and the subscriber number. You must remove all spaces, dashes, and parentheses. Example, If the user says '(248) 890-6977', you MUST pass '+12488906977'. If the user does not provide a country code, assume it is US/Canada (+1).
+        phone_number (str): The phone number to dial. MUST be in strict E.164 format. It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada), and the subscriber number. You must remove all spaces, dashes, and parentheses. Example, If the user says '(248) 890-5555', you MUST pass '+12488905555'. If the user does not provide a country code, assume it is US/Canada (+1).
         sale_property_address (str): The full address of the home for sale.
         available_appointment_times (list[str]): A list of available appointment times that the user has provided you.
         property_sale_listing_price: The price the house is listed for sale in currency format, Example: $369,000.
@@ -77,7 +77,6 @@ async def initiate_phone_call(
     if error := _validate_e164(phone_number):
         return error
 
-    phone_number = "+12488906977"
     try:
         fsbo_prompt_parameters = FSBOPromptParameters.model_validate({
             "sale_property_address": sale_property_address,
@@ -107,5 +106,7 @@ async def send_text_message(phone_number: str, text_message_to_send: str) -> str
     if error := _validate_e164(phone_number):
         return error
 
-    sms_service.send_message(phone_number, text_message_to_send)
+    # DISABLED - We need Twilio to register our number for text.
+    # Good enough for demo.
+    # sms_service.send_message(phone_number, text_message_to_send)
     return f"Successfully sent a text message to {phone_number}."

@@ -10,7 +10,7 @@ from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_
 from home_leads_gen_voice_agent.tools.agent_tools import initiate_phone_call
 from home_leads_gen_voice_agent.tools.pipeline_tools import run_lead_generation, run_marketing_content
 
-SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-09-2025"
 BOT_NAME = "Evelyn"
 
 
