@@ -8,9 +8,10 @@
 - Turn Mic on to speak with the assistant
 
 ### Examples
-- You can ask the assistant to make phone calls
-- You can ask the assistant to go to facebook.com
-- You can ask the assistant `Find me homes for sale by owner in Pontiac Michigan`
+- Assistants will try to find you home For-Sale-By-Owner (FSBO) for a given location.
+- You can ask the assistant to make AI phone calls to the home-owner.
+- You can ask the assistant to open home listings in a browser.
+- You can ask the assistant to send `carefully` crafted text messages to the home-owner.
 
 
 ### Architecture Disclaimer
