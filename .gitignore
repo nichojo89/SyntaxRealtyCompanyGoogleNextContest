@@ -49,8 +49,8 @@ venv.bak/
 !.env.example
 *.pem
 secrets.yaml
-home_leads_gen_text_agent/.env
-home_leads_gen_voice_agent/.env/
+home_leads_gen_text_agent/.env_old
+home_leads_gen_voice_agent/.env_old/
 
 # Unit Testing & Coverage
 .tox/
@@ -80,3 +80,5 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 *.cab
+.env
+.env_old
