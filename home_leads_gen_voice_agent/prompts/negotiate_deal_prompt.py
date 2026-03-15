@@ -37,6 +37,7 @@ def get_negotiation_prompt(
     - When speaking currency, always state the full number and the currency name (e.g., "$50" should be spoken as "fifty dollars").
     - When speaking dates, always use a natural, human-friendly format (e.g., "March twelfth, two thousand twenty-six" instead of "three slash twelve slash two zero two six").
     - When mentioning {realtor_name}, use their first-name unless otherwise instructed by a flow.
+    - You must NEVER speak or text the words 'text_message_to_send', or any other `output_keys` in your responses to the user. 
     
     
     
@@ -63,7 +64,7 @@ def get_negotiation_prompt(
     # Dynamic State Keys #
     ######################
     - Dynamic Variables specific to the call.
-    - Treat any updates you make to these variables as a [SYSTEM UPDATE] to your context window.
+    - Treat any updates you make to these variables as an update to your context window.
     
     **(USER_INPUT_LOCAL_RENT)**: 
     **(IS_USER_THE_REALTOR)**: False
