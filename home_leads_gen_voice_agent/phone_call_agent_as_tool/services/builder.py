@@ -28,8 +28,9 @@ def ensure_playwright_browsers():
     except subprocess.CalledProcessError as e:
         print(f"Error installing Playwright: {e.stderr.decode()}")
 
+    # Run the check before defining the agents
 
-# Run the check before defining the agents
+
 ensure_playwright_browsers()
 
 
@@ -115,6 +116,9 @@ def build_pipeline(
     pipeline = Pipeline([transport.input(), llm, transport.output()])
     task = PipelineTask(pipeline)
 
+    # Track if bot is speaking to prevent premature cancellation
+    bot_is_speaking = False
+
     @transport.event_handler("on_joined")
     async def on_joined(_, __):
         print("[Pipeline] Bot joined room — initiating Twilio bridge call...")
@@ -125,9 +129,60 @@ def build_pipeline(
         name = participant.get("info", {}).get("userName", "unknown")
         print(f"[Pipeline] First participant joined: {name}")
 
+    @transport.event_handler("on_bot_started_speaking")
+    async def on_bot_started_speaking(transport):
+        nonlocal bot_is_speaking
+        bot_is_speaking = True
+        print("[Pipeline] Bot started speaking - preventing premature cancellation")
+
+    @transport.event_handler("on_bot_stopped_speaking")
+    async def on_bot_stopped_speaking(transport):
+        nonlocal bot_is_speaking
+        bot_is_speaking = False
+        print("[Pipeline] Bot stopped speaking")
+
     @transport.event_handler("on_participant_left")
     async def on_participant_left(_, __, reason):
-        print(f"[Pipeline] Participant left ({reason}) — cancelling pipeline.")
+        print(f"[Pipeline] Participant left ({reason})")
+
+        # If bot is speaking, wait for it to finish
+        if bot_is_speaking:
+            print("[Pipeline] Bot is speaking, waiting before cancelling...")
+            # Wait up to 10 seconds for bot to finish
+            for i in range(100):  # 10 seconds with 0.1s intervals
+                if not bot_is_speaking:
+                    print("[Pipeline] Bot finished speaking, cancelling pipeline")
+                    break
+                await asyncio.sleep(0.1)
+            else:
+                print("[Pipeline] Timeout waiting for bot to finish, cancelling anyway")
+        else:
+            # Give bot a chance to respond even if not speaking yet
+            print("[Pipeline] Bot not speaking, giving 5 seconds to respond...")
+            await asyncio.sleep(5)
+
+        print("[Pipeline] Cancelling pipeline.")
         await task.cancel()
+
+        # Add frame logging to debug audio flow
+
+    @task.event_handler("on_frame_reached_downstream")
+    async def on_frame_downstream(task, frame):
+        frame_type = type(frame).__name__
+        if hasattr(frame, 'audio'):
+            print(f"[Pipeline] Audio frame detected: {frame_type}")
+        elif frame_type in ['BotStartedSpeakingFrame', 'BotStoppedSpeakingFrame', 'TTSAudioRawFrame']:
+            print(f"[Pipeline] Speaking/TTS frame: {frame_type}")
+
+    # Add after task creation
+    @task.event_handler("on_frame_reached_upstream")
+    async def on_frame_upstream(task, frame):
+        frame_type = type(frame).__name__
+        if frame_type in ['InputAudioRawFrame', 'UserAudioRawFrame']:
+            print(f"[DEBUG] Audio input frame: {frame_type}")
+
+    @transport.event_handler("on_app_message")
+    async def on_app_message(transport, message, sender):
+        print(f"[DEBUG] App message from {sender}: {message}")
 
     return task, transport

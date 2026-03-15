@@ -14,6 +14,7 @@ async def call(phone_number: str, fsbo_prompt_parameters) -> None:
 
     room = await daily_svc.create_sip_room(room_name)
     owner_token = await daily_svc.create_owner_token(room_name)
+    print(f'FSBO params{fsbo_prompt_parameters}')
 
     task, _ = build_pipeline(
         room=room,
