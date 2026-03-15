@@ -38,7 +38,7 @@ lsof -ti:8001 | xargs kill -9
 ### Create a Twilio account
 1. Purchase a phone number with Voice capabilities — this becomes your TWILIO_CALLER_ID
 2. Copy your Account SID and Auth Token from the Twilio Console dashboard
-3. Add to your .env:
+3. Add to your Google Secret Manager (⭐️Meets 'At least one Google Service requirement'):
 
 ```
 TWILIO_ACCOUNT_SID=your_account_sid
@@ -48,20 +48,31 @@ TWILIO_CALLER_ID=+1xxxxxxxxxx
 ### Create a Daily.co account
 1. From the Daily dashboard, copy your API Key
 2. Ensure your plan has SIP interconnect enabled — this is required for Twilio to bridge calls into Daily rooms
-3. Add to your .env:
+3. Add to Google Secret Manager.
 
 ```
 DAILY_API_KEY=your_api_key
 DAILY_API_URL=https://api.daily.co/v1
 ```
-### .env Example
-- You need 2 .env copies in the root directories for `home_leads_gen_text_agent` and `home_leads_gen_voice_agent`.
+### Rebuild
 ```
-GOOGLE_GENAI_USE_VERTEXAI=0
-GOOGLE_API_KEY=AIzaSyA-...
-DAILY_DOMAIN="....daily.co"
-DAILY_API_KEY="123abc..."
-TWILIO_ACCOUNT_SID="AC...."
-TWILIO_AUTH_TOKEN="123abc..."
-TWILIO_CALLER_ID="+12485557777"
+gcloud builds submit --tag gcr.io/promptoptmizer/syntax-realty .
 ```
+
+### Redeploy
+```
+gcloud run deploy syntax-realty \
+  --image gcr.io/promptoptmizer/syntax-realty \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8000 \
+  --memory 2Gi \
+  --cpu 2 \
+  --timeout 3600 \
+  --session-affinity
+  --set-env-vars GOOGLE_CLOUD_PROJECT=promptoptmizer,ENVIRONMENT=production \
+  --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest \
+  --set-secrets GOOGLE_GENAI_USE_VERTEXAI=GOOGLE_GENAI_USE_VERTEXAI:latest
+```
+

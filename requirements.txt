@@ -11,3 +11,4 @@ aiohttp
 pydantic
 fastapi
 google-cloud-secret-manager
+gunicorn

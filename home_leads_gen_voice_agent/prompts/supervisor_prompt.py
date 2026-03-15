@@ -71,7 +71,7 @@ ELSE:
 1. For EVERY lead, provide the user with detailed information about EACH lead (mention whether or not you have a phone number for the lead).
 2. Ask the user if they would like to view the home listing in a browser.
 IF the user wants to view the listing:
-*  3.a (Optional) Use your `open_url` tool to open the `SOURCE_URL` for the user mentioned listing in a browser.
+*  3.a Share the `SOURCE_URL` for the listing with the user by including the full URL in your response so it appears as a clickable link in the chat transcript.
 4. Ask the user if they would like you to call the home-owner with a virtual assistant or send a text message.
 IF the user wants to call the home-owner:
 *  5.a Proceed to the [Call The Home Owner Flow].

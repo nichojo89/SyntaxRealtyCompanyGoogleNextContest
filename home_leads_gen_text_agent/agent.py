@@ -4,7 +4,7 @@ from google.adk.tools import google_search
 from home_leads_gen_voice_agent.models.LeadTextRequest import LeadTextRequest
 from home_leads_gen_voice_agent.prompts import (lead_generation_prompt, create_text_message_prompt, evaluate_text_message_prompt, lead_details_prompt)
 from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_prompt
-from home_leads_gen_voice_agent.tools.agent_tools import open_url, initiate_phone_call, send_text_message
+from home_leads_gen_voice_agent.tools.agent_tools import initiate_phone_call, send_text_message
 
 SUBAGENT_MODEL = "gemini-2.5-flash"
 SUBAGENT_LITE_MODEL = "gemini-2.5-flash-lite"
@@ -95,7 +95,6 @@ def _build_multi_agent() -> LlmAgent | None:
             tools=[
                 AgentTool(agent=lead_generation_sequential_agent),
                 AgentTool(agent=marketing_content_loop_agent),
-                open_url,
                 initiate_phone_call,
                 send_text_message
             ],

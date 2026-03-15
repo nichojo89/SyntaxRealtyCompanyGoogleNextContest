@@ -12,14 +12,14 @@ async def run_lead_generation(location: str, criteria: str) -> str:
         location (str): The city, state, or zip code to search in.
         criteria (str): Any additional search criteria such as price range, property type, or days on market.
     """
-
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    async with httpx.AsyncClient(timeout=180.0) as client:
         response = await client.post(
             f"{BASE_URL}/lead-generation",
             json={"location": location, "criteria": criteria}
         )
         response.raise_for_status()
         return response.json()["result"]
+
 
 async def run_marketing_content(sale_property_address: str, sale_property_sale_listing_date: str = None) -> str:
     """
@@ -30,8 +30,7 @@ async def run_marketing_content(sale_property_address: str, sale_property_sale_l
         sale_property_address (str): The full address of the property to generate a pitch for.
         sale_property_sale_listing_date (str): The date the property was listed for sale.
     """
-
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    async with httpx.AsyncClient(timeout=180.0) as client:
         response = await client.post(
             f"{BASE_URL}/marketing-content",
             json={

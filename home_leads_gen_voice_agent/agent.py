@@ -6,7 +6,7 @@ from google.adk.agents.run_config import RunConfig, StreamingMode
 
 from home_leads_gen_voice_agent.api.server import app
 from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_prompt
-from home_leads_gen_voice_agent.tools.agent_tools import open_url, initiate_phone_call
+from home_leads_gen_voice_agent.tools.agent_tools import  initiate_phone_call
 from home_leads_gen_voice_agent.tools.pipeline_tools import run_lead_generation, run_marketing_content
 
 SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
@@ -30,7 +30,6 @@ supervisor = LlmAgent(
     tools=[
         run_lead_generation,
         run_marketing_content,
-        open_url,
         initiate_phone_call
     ],
 )
