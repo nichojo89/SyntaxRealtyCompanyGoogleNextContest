@@ -9,15 +9,9 @@ class RoomInfo:
     url: str
     sip_uri: str
 
-
-"""
-Daily.co API client.
-
-Responsible for creating rooms (with SIP enabled) and assigning meeting tokens.
-"""
-
-
 class DailyService:
+    """Responsible for creating rooms (with SIP enabled) and assigning meeting tokens."""
+
     _BASE = cfg.api_url
     _HEADERS = {
         "Authorization": f"Bearer {cfg.api_key}",
@@ -28,7 +22,7 @@ class DailyService:
         """
         Create a Daily room with SIP dial-in enabled.
 
-        returns Daily URL + SIP URI
+        returns: Daily URL + SIP URI
         """
 
         payload = {

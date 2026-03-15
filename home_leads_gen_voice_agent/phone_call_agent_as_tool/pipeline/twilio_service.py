@@ -1,15 +1,11 @@
-"""
-Twilio service.
-
-Connects a human over telephone and an LLM inside a WebRTC room via Daily SIP endpoint through a Twilio Conference
-"""
-
 import time
 from twilio.rest import Client
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import twilio as cfg
 
 
 class TwilioService:
+    """Connects a human over telephone and an LLM inside a WebRTC room via Daily SIP endpoint through a Twilio Conference"""
+
     def __init__(self) -> None:
         self._client = Client(cfg.account_sid, cfg.auth_token)
 

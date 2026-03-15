@@ -13,6 +13,7 @@ SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
 BOT_NAME = "Evelyn"
 
 def _start_pipeline_server():
+    """Starts FastAPI server because we seng SubAgent calls via HTTP instead of AgentTool"""
     uvicorn.run(app, host="127.0.0.1", port=8001, log_level="warning")
 
 thread = threading.Thread(target=_start_pipeline_server, daemon=True)

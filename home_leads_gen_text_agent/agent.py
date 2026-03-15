@@ -1,7 +1,6 @@
 from google.adk.agents import LlmAgent, SequentialAgent, LoopAgent
 from google.adk.tools import AgentTool
 from google.adk.tools import google_search
-
 from home_leads_gen_voice_agent.models.LeadTextRequest import LeadTextRequest
 from home_leads_gen_voice_agent.prompts import (lead_generation_prompt, create_text_message_prompt, evaluate_text_message_prompt, lead_details_prompt)
 from home_leads_gen_voice_agent.prompts.supervisor_prompt import get_supervisor_prompt
@@ -54,6 +53,7 @@ def _build_multi_agent() -> LlmAgent | None:
 
         def exit_loop(final_text_message: str) -> str:
             """Terminates the loop when text message evaluation score is 90 or above. You MUST pass the final text message into this tool."""
+
             return f"FINAL_APPROVED_TEXT: {final_text_message}"
 
         content_creator_subagent = LlmAgent(
@@ -104,20 +104,6 @@ def _build_multi_agent() -> LlmAgent | None:
     except Exception as e:
         print(f'‼️Error building home leads multi-agent system {e}')
 
-# Adds runtime behaviors for speech
-# run_config = RunConfig(
-#     speech_config=types.SpeechConfig(
-#         language_code="en-US",
-#         voice_config=types.VoiceConfig(
-#             prebuilt_voice_config=types.PrebuiltVoiceConfig(
-#                 voice_name="Charon"
-#             )
-#         ),
-#     ),
-#     response_modalities=[Modality.AUDIO, Modality.TEXT],
-#     streaming_mode=StreamingMode.BIDI,
-#     max_llm_calls=1_000,
-# )
 supervisor_evelyn = _build_multi_agent()
 if supervisor_evelyn:
     root_agent = supervisor_evelyn

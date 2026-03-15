@@ -11,3 +11,10 @@
 - You can ask the assistant to make phone calls
 - You can ask the assistant to go to facebook.com
 - You can ask the assistant `Find me homes for sale by owner in Pontiac Michigan`
+
+
+### Architecture Disclaimer
+*Why do we use a seperate pipeline server instead of Traditional Google ADK AgentTools?*
+- The native-audio preview models do not support AgentTool. The work around is to use a non-standard dual-server (FastAPI & `ADK Web` command) 
+- So, the Google ADK web server runs on port 8000 while a separate FastAPI pipeline server runs on port 8001.
+- Yes, the limitation could've been avoided using `gemini-2.0-flash-live-001`, but the user experience from `gemini-flash-live-2.5-native-audio-preview` is what I preferred.

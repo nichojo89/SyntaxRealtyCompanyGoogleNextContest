@@ -1,10 +1,3 @@
-"""
-Pipecat pipeline factory.
-
-Builds the audio pipeline (Daily transport ❥ Gemini LLM ❥ Daily transport)
-and wires the lifecycle event handlers that drive the Twilio bridge call.
-"""
-
 import asyncio
 import subprocess
 import sys
@@ -21,9 +14,6 @@ from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.twilio_service
 from home_leads_gen_voice_agent.prompts import negotiate_deal_prompt
 
 
-# ==========================================
-# 0. Ensure Playwright Browsers are Installed
-# ==========================================
 def ensure_playwright_browsers():
     print("Checking for Playwright browser binaries...")
     try:

@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field
 
 DEFAULT_NOT_AVAILABLE = "NOT AVAILABLE"
 class FSBOPromptParameters(BaseModel):
+    """Prompt parameters to send to Voice AI phone call for system prompt injection"""
+
     sale_property_address: str = Field(
         description="Address of the property",
         alias="sale_property_address",

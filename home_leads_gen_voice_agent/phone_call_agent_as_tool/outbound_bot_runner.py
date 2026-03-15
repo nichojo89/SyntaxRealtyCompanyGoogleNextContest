@@ -1,19 +1,12 @@
-"""
-main.py — entrypoint.
-
-Initiates an AI Voice call 📲
-"""
-
-import asyncio
 import time
 from pipecat.pipeline.runner import PipelineRunner
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.daily_service import DailyService
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.twilio_service import TwilioService
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.services.builder import build_pipeline
 
+async def call(phone_number: str, fsbo_prompt_parameters) -> None:
+    """Runs the outbound voice bot"""
 
-async def call(phone_number: str,
-               fsbo_prompt_parameters) -> None:
     room_name = f"VoiceBot-{int(time.time())}"
 
     daily_svc = DailyService()
@@ -30,10 +23,6 @@ async def call(phone_number: str,
         fsbo_prompt_parameters=fsbo_prompt_parameters,
     )
 
-    print("Starting pipeline runner...")
+    print("Starting call...")
     result = await PipelineRunner().run(task)
-    print(f"Ending pipeline runner... {result}")
-
-
-# if __name__ == "__main__":
-#     asyncio.run(call(phone_number="+12488906977"))
+    print(f"Ending call... {result}")

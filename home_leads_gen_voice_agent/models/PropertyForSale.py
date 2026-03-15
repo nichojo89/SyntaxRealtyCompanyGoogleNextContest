@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field, AfterValidator
 from home_leads_gen_voice_agent.utils.datetime import parse_mm_dd_yyyy
 
 class PropertyDetails(BaseModel):
+    """Property details for a home that is for sale"""
+
     sale_property_address: str = Field(
         description="Address of the property",
         alias="SALE_PROPERTY_ADDRESS",
@@ -51,6 +53,7 @@ class PropertyDetails(BaseModel):
     )
 
 class PropertyDetailsList(BaseModel):
+    """A list of properties details for a home that is for sale."""
     properties: list[PropertyDetails] = Field(
         description="List of all properties",
         alias="PROPERTIES",
