@@ -60,6 +60,8 @@ IF the user provides a location:
 ELSE:
 *  5.b Respond to the user accordingly.
 
+---
+
 ### [Provide The Leads To The User Flow]
 **GUIDELINES**
 - **ONLY** enter this conversation flow **WHEN** the LeadGenerationSequentialAgent provides you with leads.

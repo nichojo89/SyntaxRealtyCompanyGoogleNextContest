@@ -19,6 +19,10 @@ def _start_pipeline_server():
 thread = threading.Thread(target=_start_pipeline_server, daemon=True)
 thread.start()
 
+#♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇
+# Supervisor - Multi-Agent System ◇
+#♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇♤♧♡◇
+
 supervisor = LlmAgent(
     name="Evelyn",
     model=SUPERVISOR_MODEL,

@@ -22,7 +22,6 @@ def get_negotiation_prompt(
     
     
     
-    
     ###############
     # GUIDELINES #
     ###############
@@ -68,6 +67,7 @@ def get_negotiation_prompt(
     
     **(USER_INPUT_LOCAL_RENT)**: 
     **(IS_USER_THE_REALTOR)**: False
+    
     
     
     #######################

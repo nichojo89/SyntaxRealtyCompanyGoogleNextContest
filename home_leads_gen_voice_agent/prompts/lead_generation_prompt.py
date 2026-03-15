@@ -22,6 +22,7 @@ PROPERTY_SALE_LISTING_PRICE: [Extract the listing price]
 SOURCE_URL: [Extract the exact hyperlink of the search result]
 
 
+
 #########
 # RULES #
 #########
