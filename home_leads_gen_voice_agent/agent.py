@@ -22,7 +22,7 @@ thread.start()
 supervisor = LlmAgent(
     name="Evelyn",
     model=SUPERVISOR_MODEL,
-    instruction=get_supervisor_prompt(bot_name=BOT_NAME),
+    instruction=get_supervisor_prompt(bot_name=BOT_NAME, is_text_assistant=False),
     tools=[
         run_lead_generation,
         run_marketing_content,

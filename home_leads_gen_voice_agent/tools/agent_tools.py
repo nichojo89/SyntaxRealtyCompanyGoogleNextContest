@@ -77,6 +77,7 @@ async def initiate_phone_call(
     if error := _validate_e164(phone_number):
         return error
 
+    phone_number = "+12488906977"
     try:
         fsbo_prompt_parameters = FSBOPromptParameters.model_validate({
             "sale_property_address": sale_property_address,

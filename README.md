@@ -18,3 +18,7 @@
 - The native-audio preview models do not support AgentTool. The work around is to use a non-standard dual-server (FastAPI & `ADK Web` command) 
 - So, the Google ADK web server runs on port 8000 while a separate FastAPI pipeline server runs on port 8001.
 - Yes, the limitation could've been avoided using `gemini-2.0-flash-live-001`, but the user experience from `gemini-flash-live-2.5-native-audio-preview` is what I preferred.
+
+### Kill SubAgent Server when your done working:
+lsof -ti:8000 | xargs kill -9
+lsof -ti:8001 | xargs kill -9  

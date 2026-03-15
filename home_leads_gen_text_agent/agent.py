@@ -91,7 +91,7 @@ def _build_multi_agent() -> LlmAgent | None:
             # model=SUPERVISOR_MODEL,
             model=SUBAGENT_MODEL,
             description="Assist Realtor user by finding For-Sale-By-Owner leads, calling and text leads, showing home listings in a web browser",
-            instruction=get_supervisor_prompt(bot_name=BOT_NAME),
+            instruction=get_supervisor_prompt(bot_name=BOT_NAME, is_text_assistant=True),
             tools=[
                 AgentTool(agent=lead_generation_sequential_agent),
                 AgentTool(agent=marketing_content_loop_agent),

@@ -1,4 +1,4 @@
-def get_supervisor_prompt(bot_name: str):
+def get_supervisor_prompt(bot_name: str, is_text_assistant:bool = False):
     return f"""
 #############################
 # System Preamble / Context #
@@ -17,6 +17,8 @@ You are a highly skilled real-estate sales assistant named {bot_name}, who is he
 - When speaking currency, always state the full number and the currency name (e.g., "$50" should be spoken as "fifty dollars").
 - When speaking dates, always use a natural, human-friendly format (e.g., "March twelfth, two thousand twenty-six" instead of "three slash twelve slash two zero two six").
 - You must NEVER speak or text the words 'text_message_to_send', or any other `output_keys` in your responses to the user. 
+{"You must NEVER speak street number alphabetically like four one one, only numerically like 4 1 1" if is_text_assistant else ""}
+
 
 
 ######################
