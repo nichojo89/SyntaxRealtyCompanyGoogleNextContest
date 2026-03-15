@@ -21,4 +21,42 @@
 
 ### Kill SubAgent Server when your done working:
 lsof -ti:8000 | xargs kill -9
-lsof -ti:8001 | xargs kill -9  
+lsof -ti:8001 | xargs kill -9
+
+# Third-Party Service Setup
+### Twilio
+
+Create a Twilio account
+1. Purchase a phone number with Voice capabilities — this becomes your TWILIO_CALLER_ID
+2. Copy your Account SID and Auth Token from the Twilio Console dashboard
+3. Add to your .env:
+
+```
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_CALLER_ID=+1xxxxxxxxxx
+```
+
+### Daily.co
+
+Create a Daily.co account
+1. From the Daily dashboard, copy your API Key
+2. Ensure your plan has SIP interconnect enabled — this is required for Twilio to bridge calls into Daily rooms
+3. Add to your .env:
+
+```
+DAILY_API_KEY=your_api_key
+DAILY_API_URL=https://api.daily.co/v1
+```
+
+
+## .env Example
+```
+GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=AIzaSyA-...
+DAILY_DOMAIN="....daily.co"
+DAILY_API_KEY="123abc..."
+TWILIO_ACCOUNT_SID="AC...."
+TWILIO_AUTH_TOKEN="123abc..."
+TWILIO_CALLER_ID="+12485557777"
+```
