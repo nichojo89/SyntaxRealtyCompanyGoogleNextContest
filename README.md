@@ -51,6 +51,7 @@ DAILY_API_URL=https://api.daily.co/v1
 
 
 ## .env Example
+- You need 2 .env copies in the root directories for `home_leads_gen_text_agent` and `home_leads_gen_voice_agent`.
 ```
 GOOGLE_GENAI_USE_VERTEXAI=0
 GOOGLE_API_KEY=AIzaSyA-...
