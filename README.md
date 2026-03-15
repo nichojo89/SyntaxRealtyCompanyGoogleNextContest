@@ -19,6 +19,18 @@ A lead generation and outreach tool used to find For-Sale-By-Owner for any given
 # Multi-Agent System (MAS) - Architecture
 ![syntax_realty_architecture.png](assets/syntax_realty_architecture.png)
 
+### ⚠️ Architecture Disclaimers
+*Why do we use a separate pipeline server instead of Traditional Google ADK AgentTools?*
+- The native-audio preview models do not support AgentTool. The work around is to use a non-standard dual-server (FastAPI & `ADK Web` command) 
+- So, the Google ADK web server runs on port 8000 while a separate FastAPI pipeline server runs on port 8001.
+- Yes, the limitation could've been avoided using `gemini-2.0-flash-live-001`, but the user experience from `gemini-flash-live-2.5-native-audio-preview` is what I preferred.
+*Why does text assistant reference files in the voice-assistant?*
+- Because the ADK Web command puts any .py files/folders in the dropdown, when selecting the agent. Files are organized this way to avoid confusion.
+
+### Kill SubAgent Server when your done working:
+lsof -ti:8000 | xargs kill -9
+lsof -ti:8001 | xargs kill -9
+
 # Voice AI Phone Call - Architecture
 ![pipecat_call_pipeline_architecture.png](assets/pipecat_call_pipeline_architecture.png)
 
@@ -53,15 +65,3 @@ TWILIO_ACCOUNT_SID="AC...."
 TWILIO_AUTH_TOKEN="123abc..."
 TWILIO_CALLER_ID="+12485557777"
 ```
-
-### ⚠️ Architecture Disclaimers
-*Why do we use a separate pipeline server instead of Traditional Google ADK AgentTools?*
-- The native-audio preview models do not support AgentTool. The work around is to use a non-standard dual-server (FastAPI & `ADK Web` command) 
-- So, the Google ADK web server runs on port 8000 while a separate FastAPI pipeline server runs on port 8001.
-- Yes, the limitation could've been avoided using `gemini-2.0-flash-live-001`, but the user experience from `gemini-flash-live-2.5-native-audio-preview` is what I preferred.
-*Why does text assistant reference files in the voice-assistant?*
-- Because the ADK Web command puts any .py files/folders in the dropdown, when selecting the agent. Files are organized this way to avoid confusion.
-
-### Kill SubAgent Server when your done working:
-lsof -ti:8000 | xargs kill -9
-lsof -ti:8001 | xargs kill -9
