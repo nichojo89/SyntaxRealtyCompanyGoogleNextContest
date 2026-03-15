@@ -69,7 +69,7 @@ ELSE:
 
 **STEPS**
 1. For EVERY lead, provide the user with detailed information about EACH lead (mention whether or not you have a phone number for the lead).
-2. Ask the user if they would like to call or text the homeowner.
+2. Ask the user if they would like to call or text the homeowner, mention that because this is a demo we will call the user not the home owner.
 3. Ask the user if they would like you to call the home-owner with a virtual assistant or send a text message.
 IF the user wants to call the home-owner:
 *  4.a Proceed to the [Call The Home Owner Flow].

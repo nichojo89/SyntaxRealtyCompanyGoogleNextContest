@@ -6,11 +6,17 @@ RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
     curl \
+    ca-certificates \
+    && update-ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Explicitly upgrade certifi so Python HTTP requests have the latest root certificates
+RUN pip install --upgrade certifi
+
+# Install playwright and its dependencies
 RUN python -m playwright install chromium
 RUN python -m playwright install-deps chromium
 
@@ -25,4 +31,7 @@ CMD ["gunicorn", "main:app", \
      "--worker-class", "uvicorn.workers.UvicornWorker", \
      "--bind", "0.0.0.0:8000", \
      "--timeout", "300", \
-     "--workers", "1"]
+     "--workers", "1", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--log-level", "debug"]
