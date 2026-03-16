@@ -17,10 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Explicitly upgrade certifi so Python HTTP requests have the latest root certificates
 RUN pip install --upgrade certifi
 
-# Install playwright and its dependencies
-RUN python -m playwright install chromium
-RUN python -m playwright install-deps chromium
-
 COPY . .
 
 ENV PYTHONUNBUFFERED=1

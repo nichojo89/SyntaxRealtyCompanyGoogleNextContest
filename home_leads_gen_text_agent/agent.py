@@ -8,7 +8,7 @@ from home_leads_gen_voice_agent.tools.agent_tools import initiate_phone_call, se
 
 SUBAGENT_MODEL = "gemini-2.5-flash"
 SUBAGENT_LITE_MODEL = "gemini-2.5-flash-lite"
-SUPERVISOR_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+SUPERVISOR_MODEL = "gemini-2.5-flash"
 BOT_NAME = "Evelyn"
 
 def _build_multi_agent() -> LlmAgent | None:

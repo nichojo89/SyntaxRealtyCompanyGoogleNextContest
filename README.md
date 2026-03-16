@@ -58,7 +58,7 @@ DAILY_API_URL=https://api.daily.co/v1
 ```
 gcloud builds submit --tag gcr.io/promptoptmizer/syntax-realty .
 ```
-
+We deployed the conversational logic on Cloud Run for rapid serverless scaling, but routed the real-time WebRTC audio processing to a dedicated stateful Compute node to minimize latency and bypass serverless NAT restrictions.
 ### Redeploy
 ```
 gcloud run deploy syntax-realty \
@@ -67,11 +67,10 @@ gcloud run deploy syntax-realty \
   --region us-central1 \
   --allow-unauthenticated \
   --port 8000 \
-  --memory 2Gi \
-  --cpu 2 \
-  --timeout 300 \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=promptoptmizer,ENVIRONMENT=production \
-  --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest \
-  --set-secrets GOOGLE_GENAI_USE_VERTEXAI=GOOGLE_GENAI_USE_VERTEXAI:latest
+  --network=default \
+  --subnet=default \
+  --vpc-egress=private-ranges-only \
+  --set-env-vars GOOGLE_CLOUD_PROJECT=promptoptmizer,GOOGLE_GENAI_USE_VERTEXAI=0,ENVIRONMENT=production \
+  --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest
 ```
 

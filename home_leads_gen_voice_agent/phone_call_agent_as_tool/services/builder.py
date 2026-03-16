@@ -3,9 +3,12 @@ import subprocess
 import sys
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.task import PipelineTask
+from pipecat.processors.logger import FrameLogger
 from pipecat.services.gemini_multimodal_live.gemini import GeminiVADParams
 from pipecat.services.google.gemini_live.llm import InputParams, GeminiLiveLLMService
 from pipecat.transports.daily.transport import DailyParams, DailyTransport
+from pipecat.frames.frames import LLMMessagesUpdateFrame, TextFrame
+
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import daily as daily_cfg
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.config.settings import gemini as gemini_cfg
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
@@ -14,33 +17,10 @@ from home_leads_gen_voice_agent.phone_call_agent_as_tool.pipeline.twilio_service
 from home_leads_gen_voice_agent.prompts import negotiate_deal_prompt
 
 
-def ensure_playwright_browsers():
-    print("Checking for Playwright browser binaries...")
-    try:
-        # Runs `python -m playwright install chromium` in the background
-        subprocess.run(
-            [sys.executable, "-m", "playwright", "install", "chromium"],
-            check=True,
-            stdout=subprocess.DEVNULL,  # Hides the output if already installed
-            stderr=subprocess.PIPE
-        )
-        print("Playwright browsers are ready!")
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing Playwright: {e.stderr.decode()}")
-
-    # Run the check before defining the agents
-
-
-ensure_playwright_browsers()
-
 
 def _get_voice_call_system_instruction(fsbo_prompt_parameters: FSBOPromptParameters) -> str:
-    """
-    Gets system instruction from the to negotiate deals for homes that have been listed online for a long time.
-
-    Returns: system_instruction
-    """
-
+    """    Gets system instruction from the to negotiate deals for homes that have been listed online for a long time.
+    Returns: system_instruction    """
     bot_name = "Benjamin"
     realtor_name = "Emily West"
     realty_company = "Syntax Realty Company"
@@ -63,7 +43,6 @@ def _get_voice_call_system_instruction(fsbo_prompt_parameters: FSBOPromptParamet
 
 def build_transport(room: RoomInfo, owner_token: str) -> DailyTransport:
     """Builds the daily transport for the given room."""
-
     return DailyTransport(
         room_url=room.url,
         token=owner_token,
@@ -81,7 +60,6 @@ def build_transport(room: RoomInfo, owner_token: str) -> DailyTransport:
 
 def build_llm(fsbo_prompt_parameters: FSBOPromptParameters) -> GeminiLiveLLMService:
     """Builds the Gemini Live LLM service."""
-
     prompt = _get_voice_call_system_instruction(fsbo_prompt_parameters=fsbo_prompt_parameters)
 
     return GeminiLiveLLMService(
@@ -104,16 +82,18 @@ def build_pipeline(
         recipient_phone: str,
         fsbo_prompt_parameters: FSBOPromptParameters
 ) -> tuple[PipelineTask, DailyTransport]:
-    """
-    Assemble the full Pipecat pipeline and register event handlers.
-
-    returns runnable PipelineTask and the transport (so the caller can hand it to PipelineRunner if needed).
-    """
-
     transport = build_transport(room, owner_token)
     llm = build_llm(fsbo_prompt_parameters=fsbo_prompt_parameters)
 
-    pipeline = Pipeline([transport.input(), llm, transport.output()])
+    pipeline = Pipeline([
+        FrameLogger("LOG FRAME 0"),
+        transport.input(),
+        FrameLogger("LOG FRAME 1"),
+        llm,
+        FrameLogger("LOG FRAME 2"),
+        transport.output(),
+        FrameLogger("LOG FRAME 3")
+    ])
     task = PipelineTask(pipeline)
 
     # Track if bot is speaking to prevent premature cancellation
@@ -122,21 +102,40 @@ def build_pipeline(
     @transport.event_handler("on_joined")
     async def on_joined(_, __):
         print("[Pipeline] Bot joined room — initiating Twilio bridge call...")
-        await asyncio.to_thread(twilio.bridge_call, room.sip_uri, recipient_phone)
+        print(f"[DEBUG] SIP URI: {room.sip_uri}")
+        print(f"[DEBUG] Recipient: {recipient_phone}")
+
+        try:
+            result = await asyncio.to_thread(twilio.bridge_call, room.sip_uri, recipient_phone)
+            print(f"[DEBUG] Twilio bridge result: {result}")
+        except Exception as e:
+            print(f"[ERROR] Twilio bridge failed: {e}")
 
     @transport.event_handler("on_first_participant_joined")
     async def on_first_participant_joined(_, participant):
         name = participant.get("info", {}).get("userName", "unknown")
         print(f"[Pipeline] First participant joined: {name}")
 
-    @transport.event_handler("on_bot_started_speaking")
-    async def on_bot_started_speaking(transport):
+        async def trigger_bot_greeting():
+            print("[Pipeline] Waiting for Cloud Run WebRTC TCP fallback...")
+            # Wait 4 seconds to guarantee the Cloud Run audio network is fully open
+            await asyncio.sleep(4.0)
+
+            print("[Pipeline] Prompting bot to speak first...")
+            # Use TextFrame instead! Gemini will consume this and speak out loud.
+            await task.queue_frames([TextFrame(text="Hi, I just answered the phone. Please introduce yourself.")])
+
+        # Fire and forget
+        asyncio.create_task(trigger_bot_greeting())
+
+    @task.event_handler("on_bot_started_speaking")
+    async def on_bot_started_speaking(task):
         nonlocal bot_is_speaking
         bot_is_speaking = True
         print("[Pipeline] Bot started speaking - preventing premature cancellation")
 
-    @transport.event_handler("on_bot_stopped_speaking")
-    async def on_bot_stopped_speaking(transport):
+    @task.event_handler("on_bot_stopped_speaking")
+    async def on_bot_stopped_speaking(task):
         nonlocal bot_is_speaking
         bot_is_speaking = False
         print("[Pipeline] Bot stopped speaking")
@@ -164,7 +163,13 @@ def build_pipeline(
         print("[Pipeline] Cancelling pipeline.")
         await task.cancel()
 
-        # Add frame logging to debug audio flow
+        # Add frame debugging to trace audio flow
+
+    @task.event_handler("on_frame_reached_upstream")
+    async def on_frame_upstream(task, frame):
+        frame_type = type(frame).__name__
+        if frame_type in ['InputAudioRawFrame', 'UserAudioRawFrame']:
+            print(f"[DEBUG] Audio input frame: {frame_type}")
 
     @task.event_handler("on_frame_reached_downstream")
     async def on_frame_downstream(task, frame):
@@ -173,16 +178,5 @@ def build_pipeline(
             print(f"[Pipeline] Audio frame detected: {frame_type}")
         elif frame_type in ['BotStartedSpeakingFrame', 'BotStoppedSpeakingFrame', 'TTSAudioRawFrame']:
             print(f"[Pipeline] Speaking/TTS frame: {frame_type}")
-
-    # Add after task creation
-    @task.event_handler("on_frame_reached_upstream")
-    async def on_frame_upstream(task, frame):
-        frame_type = type(frame).__name__
-        if frame_type in ['InputAudioRawFrame', 'UserAudioRawFrame']:
-            print(f"[DEBUG] Audio input frame: {frame_type}")
-
-    @transport.event_handler("on_app_message")
-    async def on_app_message(transport, message, sender):
-        print(f"[DEBUG] App message from {sender}: {message}")
 
     return task, transport

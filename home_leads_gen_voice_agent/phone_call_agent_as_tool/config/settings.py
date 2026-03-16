@@ -50,8 +50,8 @@ class TwilioSettings:
 class GeminiSettings:
     gemini_api_key: str = get_secret("GOOGLE_API_KEY")
     use_vertex_ai: str = get_secret("GOOGLE_GENAI_USE_VERTEXAI")
-    location: str = "us-east4"
-    model: str = "gemini-2.5-flash-native-audio-preview-12-2025"
+    location: str = "us-central1"
+    model: str = "gemini-2.5-flash-native-audio-preview-09-2025"
     voice_id: str = "Charon"
     temperature: float = 0.7
     max_tokens: int = 2048

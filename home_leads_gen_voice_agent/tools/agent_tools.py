@@ -1,9 +1,13 @@
 import asyncio
 import re
 import webbrowser
+
+import requests
+
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.models.fsbo_prompt_parameters import FSBOPromptParameters
 from home_leads_gen_voice_agent.phone_call_agent_as_tool.outbound_bot_runner import call
 from home_leads_gen_voice_agent.services.sms_service import TwilioSmsService
+
 
 sms_service = TwilioSmsService()
 
@@ -61,6 +65,8 @@ async def initiate_phone_call(
     """
     Use this tool whenever the user asks you to call someone, make a phone call, or connect them to a number via audio.
     You are required to read your context window to understand what values to pass for parameters.
+    The phone number that you pass MUST BE A PHONE NUMBER THE USER PROVIDED AND NOT THE HOMEOWNERS PHONE NUMBER.
+    This is strictly a DEMO so you must use the phone number that the user gave you, not the home-owners phone number..
 
     Args:
         phone_number (str): The phone number to dial. MUST be in strict E.164 format. It must begin with a plus sign (+), followed by the country code (e.g., 1 for US/Canada), and the subscriber number. You must remove all spaces, dashes, and parentheses. Example, If the user says '(248) 890-5555', you MUST pass '+12488905555'. If the user does not provide a country code, assume it is US/Canada (+1).
@@ -76,9 +82,8 @@ async def initiate_phone_call(
 
     if error := _validate_e164(phone_number):
         return error
-
-    try:
-        fsbo_prompt_parameters = FSBOPromptParameters.model_validate({
+    VM_IP = "10.128.0.7"
+    fsbo_parameters = {
             "sale_property_address": sale_property_address,
             "available_appointment_times": available_appointment_times,
             "property_sale_listing_price": property_sale_listing_price,
@@ -87,11 +92,37 @@ async def initiate_phone_call(
             "sale_property_acquired_by_owner_amount": sale_property_acquired_by_owner_amount,
             "sale_property_acquired_by_owner_year": sale_property_acquired_by_owner_year,
             "local_rent_estimation": local_rent_estimation
-        })
-        asyncio.create_task(call(phone_number=phone_number, fsbo_prompt_parameters=fsbo_prompt_parameters))
-        return f"Successfully initiated the call to {phone_number}."
+        }
+
+    payload = {
+        "phone_number": phone_number,
+        "fsbo_data": fsbo_parameters
+    }
+
+    try:
+        # Send the instruction to the VM
+        response = requests.post(f"http://{VM_IP}:8000/start_call", json=payload, timeout=5)
+        response.raise_for_status()
+        return f"Successfully initiated the phone call to {phone_number}. The bot is calling them now."
+
     except Exception as e:
-        return f"You failed to initiate the call: {e}"
+        return f"Failed to connect to the Voice API Worker: {e}"
+
+    # try:
+    #     fsbo_prompt_parameters = FSBOPromptParameters.model_validate({
+    #         "sale_property_address": sale_property_address,
+    #         "available_appointment_times": available_appointment_times,
+    #         "property_sale_listing_price": property_sale_listing_price,
+    #         "property_sale_listing_date": property_sale_listing_date,
+    #         "sale_property_condition": sale_property_condition,
+    #         "sale_property_acquired_by_owner_amount": sale_property_acquired_by_owner_amount,
+    #         "sale_property_acquired_by_owner_year": sale_property_acquired_by_owner_year,
+    #         "local_rent_estimation": local_rent_estimation
+    #     })
+    #     asyncio.create_task(call(phone_number=phone_number, fsbo_prompt_parameters=fsbo_prompt_parameters))
+    #     return f"Successfully initiated the call to {phone_number}."
+    # except Exception as e:
+    #     return f"You failed to initiate the call: {e}"
 
 
 async def send_text_message(phone_number: str, text_message_to_send: str) -> str:
