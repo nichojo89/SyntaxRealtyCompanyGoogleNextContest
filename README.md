@@ -7,6 +7,12 @@ A lead generation and outreach tool used to find For-Sale-By-Owner for any given
 - You can ask the assistant to send `carefully` crafted text messages to the home-owner.
 - You can use text or voice assistant agents. Please note, you **CAN NOT** try to send text to the voice agent, please use the microphone.
 
+### Video Demo
+https://youtu.be/YzdQZB0FYU8
+
+### Live Demo
+https://syntax-realty-550203506686.us-central1.run.app/dev-ui/
+
 ### Setup Instructions
 - Use a Python 3.11 interpreter for best compatibility.
 - If running on mac, run the `Install Certificates.command`file inside `/Applications/Python 3.11` folder.
@@ -16,8 +22,9 @@ A lead generation and outreach tool used to find For-Sale-By-Owner for any given
 - Select the  `home_leads_gen_text_agent` or `home_leads_gen_voice_agent` from the dropdown menu (if voice selected, DO NOT TEXT).
 - Turn Mic on to speak with the assistant for voice assistant.
 
-# Multi-Agent System (MAS) - Architecture
-![syntax_realty_architecture.png](assets/syntax_realty_architecture.png)
+## Platform Architecture
+- High Level Design for Platform, Multi Agent System and Voice AI Phone Calls.
+![platform_architecture.png](assets/platform_architecture.png)
 
 ### ⚠️ Architecture Disclaimers
 *Why do we use a separate pipeline server instead of Traditional Google ADK AgentTools?*
@@ -26,13 +33,6 @@ A lead generation and outreach tool used to find For-Sale-By-Owner for any given
 - Yes, the limitation could've been avoided using `gemini-2.0-flash-live-001`, but the user experience from `gemini-flash-live-2.5-native-audio-preview` is what I preferred.
 *Why does text assistant reference files in the voice-assistant?*
 - Because the ADK Web command puts any .py files/folders in the dropdown, when selecting the agent. Files are organized this way to avoid confusion.
-
-### Kill SubAgent Server when your done working:
-lsof -ti:8000 | xargs kill -9
-lsof -ti:8001 | xargs kill -9
-
-# Voice AI Phone Call - Architecture
-![pipecat_call_pipeline_architecture.png](assets/pipecat_call_pipeline_architecture.png)
 
 # Third-Party Service Setup
 ### Create a Twilio account
@@ -61,16 +61,6 @@ gcloud builds submit --tag gcr.io/promptoptmizer/syntax-realty .
 We deployed the conversational logic on Cloud Run for rapid serverless scaling, but routed the real-time WebRTC audio processing to a dedicated stateful Compute node to minimize latency and bypass serverless NAT restrictions.
 ### Redeploy
 ```
-gcloud run deploy syntax-realty \
-  --image gcr.io/promptoptmizer/syntax-realty \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --port 8000 \
-  --network=default \
-  --subnet=default \
-  --vpc-egress=private-ranges-only \
-  --set-env-vars GOOGLE_CLOUD_PROJECT=promptoptmizer,GOOGLE_GENAI_USE_VERTEXAI=0,ENVIRONMENT=production \
-  --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest
+gcloud builds submit --tag gcr.io/promptoptmizer/syntax-realty . && gcloud run deploy syntax-realty --image gcr.io/promptoptmizer/syntax-realty --platform managed --region us-central1 --allow-unauthenticated --port 8000 --memory 2Gi --cpu 2 --timeout 300 --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=0,ENVIRONMENT=production --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest --set-secrets TWILIO_ACCOUNT_SID=TWILIO_ACCOUNT_SID:latest --set-secrets TWILIO_AUTH_TOKEN=TWILIO_AUTH_TOKEN:latest --set-secrets DAILY_API_KEY=DAILY_API_KEY:latest --set-secrets DAILY_DOMAIN=DAILY_DOMAIN:latest --set-secrets TWILIO_CALLER_ID=TWILIO_CALLER_ID:latest
 ```
 
